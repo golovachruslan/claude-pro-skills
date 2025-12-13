@@ -1,0 +1,14 @@
+{
+  "name": "claude-pro-skills",
+  "description": "Claude Pro Skills - A collection of Claude Code plugins and skills for productivity and development",
+  "version": "1.0.0",
+  "repository": "https://github.com/golovachruslan/claude-pro-skills",
+  "plugins": [
+    {
+      "name": "skills-improver",
+      "path": "skills-improver-plugin",
+      "version": "1.0.0"
+    }
+  ]
+}
+

@@ -5,11 +5,11 @@ description: Analyze conversation history and improve existing plugins based on 
 
 # Improve Plugin Command
 
-Invoke the skill-improver skill to analyze the current conversation and improve existing Claude Code plugins based on feedback and usage patterns.
+Invoke the skills-improver skill to analyze the current conversation and improve existing Claude Code plugins based on feedback and usage patterns.
 
 ## Instructions
 
-1. **Activate the skill-improver skill** by invoking it through the Skill tool
+1. **Activate the skills-improver skill** by invoking it through the Skill tool
 2. **Focus on plugin improvements**:
    - Analyze conversation for plugin mentions and usage
    - Identify issues with plugin.json metadata
@@ -39,7 +39,7 @@ Use this command when:
 ## Expected Flow
 
 1. You run `/improve-plugin`
-2. Claude invokes the skill-improver skill
+2. Claude invokes the skills-improver skill
 3. Claude analyzes the conversation for plugin usage and feedback
 4. Claude presents proposed improvements and asks for approval
 5. Upon approval, Claude implements the changes
@@ -94,7 +94,7 @@ Do you approve these changes? Reply with:
 
 ## Plugin-Specific Improvements
 
-The skill-improver handles several types of plugin improvements:
+The skills-improver handles several types of plugin improvements:
 
 ### Metadata (plugin.json)
 - Update version numbers

@@ -84,7 +84,7 @@ Analyzes conversation history to improve existing Claude Code plugins.
 
 ### Skills
 
-#### skill-improver
+#### skills-improver
 The core skill that powers the improvement workflow. Automatically invoked by the commands above.
 
 **Capabilities:**
@@ -208,7 +208,7 @@ The plugin includes comprehensive reference documentation with patterns for:
 - Organizing by domain or framework
 - Adding quick reference sections
 
-See `skills/skill-improver/references/improvement-patterns.md` for detailed examples.
+See `skills/skills-improver/references/improvement-patterns.md` for detailed examples.
 
 ## Best Practices
 
@@ -224,7 +224,7 @@ See `skills/skill-improver/references/improvement-patterns.md` for detailed exam
 No configuration required! The plugin works out of the box.
 
 Optional: You can customize the improvement patterns by editing:
-- `skills/skill-improver/references/improvement-patterns.md`
+- `skills/skills-improver/references/improvement-patterns.md`
 
 ## Technical Details
 
@@ -235,14 +235,14 @@ Optional: You can customize the improvement patterns by editing:
 
 ### File Structure
 ```
-skill-improver-plugin/
+skills-improver-plugin/
 ├── .claude-plugin/
 │   └── plugin.json           # Plugin metadata
 ├── commands/
 │   ├── improve-skills.md     # Skill improvement command
 │   └── improve-plugin.md     # Plugin improvement command
 ├── skills/
-│   └── skill-improver/
+│   └── skills-improver/
 │       ├── SKILL.md          # Main skill instructions
 │       ├── scripts/
 │       │   ├── analyze_conversation.py

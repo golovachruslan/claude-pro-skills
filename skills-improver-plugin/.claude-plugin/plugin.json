@@ -1,5 +1,5 @@
 {
-  "name": "skill-improver",
+  "name": "skills-improver",
   "version": "1.0.0",
   "description": "Analyzes conversation history to improve existing Claude Code skills and plugins based on user feedback and usage patterns. Includes commands, automated analysis scripts, and comprehensive improvement workflows.",
   "author": {
@@ -24,7 +24,7 @@
   ],
   "categories": ["productivity", "development"],
   "components": {
-    "skills": ["skill-improver"],
+    "skills": ["skills-improver"],
     "commands": ["improve-skills", "improve-plugin"]
   }
 }

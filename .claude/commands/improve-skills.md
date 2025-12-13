@@ -5,12 +5,12 @@ description: Analyze conversation history and improve existing skills based on u
 
 # Improve Skills Command
 
-Invoke the skill-improver skill to analyze the current conversation and improve existing Claude Code skills based on feedback and usage patterns.
+Invoke the skills-improver skill to analyze the current conversation and improve existing Claude Code skills based on feedback and usage patterns.
 
 ## Instructions
 
-1. **Activate the skill-improver skill** by invoking it through the Skill tool
-2. **Follow the skill-improver workflow**:
+1. **Activate the skills-improver skill** by invoking it through the Skill tool
+2. **Follow the skills-improver workflow**:
    - Analyze conversation history for skills mentioned or used
    - Identify feedback, issues, and improvement opportunities
    - Propose specific changes with rationale
@@ -39,7 +39,7 @@ Use this command when:
 ## Expected Flow
 
 1. You run `/improve-skills`
-2. Claude invokes the skill-improver skill
+2. Claude invokes the skills-improver skill
 3. Claude analyzes the conversation for skill usage and feedback
 4. Claude presents proposed improvements and asks for approval
 5. Upon approval, Claude implements the changes

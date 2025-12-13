@@ -1,9 +1,9 @@
 ---
-name: skill-improver
+name: skills-improver
 description: Analyzes conversation history to improve existing Claude Code skills and plugins based on user feedback. Use this skill when users mention issues with skills/plugins, request improvements to existing skills/plugins, or explicitly ask to improve/update skills or plugins based on the current conversation. Triggers include "improve skill", "improve plugin", "update skill based on feedback", "fix this skill", or similar improvement requests.
 ---
 
-# Skill Improver
+# Skills Improver
 
 ## Overview
 
