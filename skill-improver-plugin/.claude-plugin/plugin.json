@@ -1,0 +1,30 @@
+{
+  "name": "skill-improver",
+  "version": "1.0.0",
+  "description": "Analyzes conversation history to improve existing Claude Code skills and plugins based on user feedback and usage patterns. Includes commands, automated analysis scripts, and comprehensive improvement workflows.",
+  "author": {
+    "name": "Claude Pro Skills",
+    "email": "[email protected]"
+  },
+  "repository": "https://github.com/golovachruslan/claude-pro-skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "plugins",
+    "improvement",
+    "feedback",
+    "analysis",
+    "optimization",
+    "workflow",
+    "conversation-analysis",
+    "metadata",
+    "documentation",
+    "iterative-development",
+    "skill-enhancement"
+  ],
+  "categories": ["productivity", "development"],
+  "components": {
+    "skills": ["skill-improver"],
+    "commands": ["improve-skills", "improve-plugin"]
+  }
+}
