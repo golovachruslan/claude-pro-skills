@@ -1,0 +1,39 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-pro-skills-marketplace",
+  "version": "1.0.0",
+  "description": "Claude Code marketplace configuration for Claude Pro Skills plugins and extensions",
+  "owner": {
+    "name": "Claude Pro Skills",
+    "email": "[email protected]"
+  },
+  "plugins": [
+    {
+      "name": "skill-improver",
+      "source": "./skill-improver-plugin",
+      "description": "Analyzes conversation history to improve existing Claude Code skills and plugins based on user feedback and usage patterns. Includes commands, automated analysis scripts, and comprehensive improvement workflows.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Claude Pro Skills",
+        "email": "[email protected]"
+      },
+      "repository": "https://github.com/golovachruslan/claude-pro-skills",
+      "license": "MIT",
+      "categories": ["productivity", "development"],
+      "keywords": [
+        "skills",
+        "plugins",
+        "improvement",
+        "feedback",
+        "analysis",
+        "optimization",
+        "workflow",
+        "conversation-analysis",
+        "metadata",
+        "documentation",
+        "iterative-development",
+        "skill-enhancement"
+      ]
+    }
+  ]
+}
