@@ -1,0 +1,35 @@
+{
+  "name": "obsidian",
+  "version": "1.0.0",
+  "description": "Obsidian note management with PARA method, MOCs, and formatting tools for knowledge workers",
+  "author": {
+    "name": "Ruslan Halavach",
+    "url": "https://github.com/golovachruslan"
+  },
+  "repository": "https://github.com/golovachruslan/claude-pro-skills",
+  "license": "MIT",
+  "keywords": [
+    "obsidian",
+    "notes",
+    "knowledge-management",
+    "PARA",
+    "markdown",
+    "vault",
+    "PKM",
+    "zettelkasten",
+    "moc"
+  ],
+  "categories": [
+    "productivity",
+    "knowledge-management"
+  ],
+  "components": {
+    "commands": [
+      "commands/create-note.md",
+      "commands/create-moc.md",
+      "commands/format-document.md",
+      "commands/organize-note.md"
+    ],
+    "skills": ["skills/obsidian"]
+  }
+}
