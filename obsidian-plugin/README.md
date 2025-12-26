@@ -244,6 +244,18 @@ MIT License - See LICENSE file for details
 
 ## Changelog
 
+### 2.0.0 (2025-12-26) - BREAKING CHANGE
+
+- **BREAKING**: Command names now use plugin prefix
+  - `/create-note` → `/obsidian:create-note`
+  - `/create-moc` → `/obsidian:create-moc`
+  - `/format-document` → `/obsidian:format-document`
+  - `/organize-note` → `/obsidian:organize-note`
+- Prevents command name collisions across plugins
+- Improves command discoverability and organization
+
+**Migration**: Update any workflows or scripts using old command names. The unprefixed commands will no longer work.
+
 ### 1.0.0 (2025-12-25)
 
 - Initial release

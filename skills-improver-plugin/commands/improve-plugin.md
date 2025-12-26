@@ -1,5 +1,5 @@
 ---
-name: improve-plugin
+name: skills-improver:improve-plugin
 description: Analyze conversation history and improve existing plugins based on user feedback
 ---
 
@@ -38,7 +38,7 @@ Use this command when:
 
 ## Expected Flow
 
-1. You run `/improve-plugin`
+1. You run `/skills-improver:improve-plugin`
 2. Claude invokes the skill-improver skill
 3. Claude analyzes the conversation for plugin usage and feedback
 4. Claude presents proposed improvements and asks for approval

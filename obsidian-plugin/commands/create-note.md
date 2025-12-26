@@ -1,5 +1,5 @@
 ---
-name: create-note
+name: obsidian:create-note
 description: Create a new Obsidian note with proper structure, frontmatter, and organization
 argument-hint: "[note-name] [type:project|area|resource|moc|daily]"
 allowed-tools:

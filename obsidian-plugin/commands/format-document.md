@@ -1,5 +1,5 @@
 ---
-name: format-document
+name: obsidian:format-document
 description: Format and clean up Obsidian documents (removes extra whitespace, fixes tables, cleans Mermaid diagrams)
 argument-hint: "[file-path]"
 allowed-tools:

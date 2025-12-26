@@ -54,7 +54,7 @@ The Skill Improver Plugin provides a complete workflow for iteratively enhancing
 
 ### Commands
 
-#### `/improve-skills`
+#### `/skills-improver:improve-skills`
 Analyzes conversation history to improve existing Claude Code skills.
 
 **When to use:**
@@ -65,10 +65,10 @@ Analyzes conversation history to improve existing Claude Code skills.
 
 **Example:**
 ```
-/improve-skills
+/skills-improver:improve-skills
 ```
 
-#### `/improve-plugin`
+#### `/skills-improver:improve-plugin`
 Analyzes conversation history to improve existing Claude Code plugins.
 
 **When to use:**
@@ -79,7 +79,7 @@ Analyzes conversation history to improve existing Claude Code plugins.
 
 **Example:**
 ```
-/improve-plugin
+/skills-improver:improve-plugin
 ```
 
 ### Skills
@@ -124,8 +124,8 @@ python scripts/apply_improvements.py <skill-path> <improvements.json>
 1. **Use a skill or plugin** in your conversation
 2. **Notice opportunities for improvement** (errors, missing features, unclear docs)
 3. **Run the command:**
-   - `/improve-skills` for skills
-   - `/improve-plugin` for plugins
+   - `/skills-improver:improve-skills` for skills
+   - `/skills-improver:improve-plugin` for plugins
 4. **Review the proposal** that Claude presents
 5. **Approve or modify** the proposed changes
 6. **Changes are implemented** automatically
@@ -137,7 +137,7 @@ python scripts/apply_improvements.py <skill-path> <improvements.json>
 User: I tried to use the data-analyzer skill but it didn't trigger when I said
       "help me with this spreadsheet"
 
-User: /improve-skills
+User: /skills-improver:improve-skills
 
 Claude: I'll analyze the conversation to identify skill improvement opportunities...
 
@@ -257,7 +257,7 @@ skills-improver-plugin/
 
 Improvements and feedback welcome! If you encounter issues or have suggestions:
 
-1. Use the `/improve-plugin` command to improve this very plugin!
+1. Use the `/skills-improver:improve-plugin` command to improve this very plugin!
 2. Submit issues or PRs to the repository
 3. Share your improvement patterns with the community
 
@@ -269,9 +269,19 @@ MIT License - see LICENSE file for details
 
 For questions, issues, or feedback:
 - Create an issue in the GitHub repository
-- Use `/improve-plugin` to suggest improvements to this plugin
+- Use `/skills-improver:improve-plugin` to suggest improvements to this plugin
 
 ## Changelog
+
+### v2.0.0 (2025-12-26) - BREAKING CHANGE
+
+- **BREAKING**: Command names now use plugin prefix
+  - `/improve-skills` → `/skills-improver:improve-skills`
+  - `/improve-plugin` → `/skills-improver:improve-plugin`
+- Prevents command name collisions across plugins
+- Improves command discoverability and organization
+
+**Migration**: Update any workflows or scripts using old command names. The unprefixed commands will no longer work.
 
 ### v1.0.0 (2025-12-13)
 - Initial release
@@ -279,7 +289,7 @@ For questions, issues, or feedback:
 - Skill and plugin improvement workflows
 - Automated improvement application
 - Comprehensive improvement pattern library
-- `/improve-skills` and `/improve-plugin` commands
+- `/skills-improver:improve-skills` and `/skills-improver:improve-plugin` commands
 
 ## Examples
 

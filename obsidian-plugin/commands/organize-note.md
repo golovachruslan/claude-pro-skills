@@ -1,5 +1,5 @@
 ---
-name: organize-note
+name: obsidian:organize-note
 description: Analyze and organize any Obsidian note - extract content to permanent notes, create links, and improve vault structure
 argument-hint: "[file-path]"
 allowed-tools:

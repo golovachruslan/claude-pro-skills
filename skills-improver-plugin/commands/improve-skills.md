@@ -1,5 +1,5 @@
 ---
-name: improve-skills
+name: skills-improver:improve-skills
 description: Analyze conversation history and improve existing skills based on user feedback
 ---
 
@@ -38,7 +38,7 @@ Use this command when:
 
 ## Expected Flow
 
-1. You run `/improve-skills`
+1. You run `/skills-improver:improve-skills`
 2. Claude invokes the skill-improver skill
 3. Claude analyzes the conversation for skill usage and feedback
 4. Claude presents proposed improvements and asks for approval

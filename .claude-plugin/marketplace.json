@@ -11,14 +11,14 @@
     {
       "name": "skills-improver",
       "description": "Analyze conversation history to improve existing skills and plugins based on user feedback",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "source": "./skills-improver-plugin",
       "category": "development"
     },
     {
       "name": "obsidian",
       "description": "Obsidian note management with PARA method, MOCs, and formatting tools",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "source": "./obsidian-plugin",
       "category": "productivity"
     }

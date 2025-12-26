@@ -1,5 +1,5 @@
 ---
-name: create-moc
+name: obsidian:create-moc
 description: Create a Map of Content (MOC) to organize related notes in your Obsidian vault
 argument-hint: "[moc-name] [topic]"
 allowed-tools:
