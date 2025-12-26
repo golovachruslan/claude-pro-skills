@@ -1,0 +1,26 @@
+{
+  "name": "mermaid",
+  "version": "1.0.0",
+  "description": "Create renderer-compatible Mermaid diagrams with human-readable ASCII sidecars. Supports flowcharts, sequence, class, state, ER, journey, Gantt, and pie diagrams with fallbacks for unsupported types.",
+  "author": {
+    "name": "Ruslan Halavach"
+  },
+  "repository": "https://github.com/golovachruslan/claude-pro-skills",
+  "license": "MIT",
+  "keywords": [
+    "mermaid",
+    "diagrams",
+    "flowchart",
+    "sequence-diagram",
+    "class-diagram",
+    "state-diagram",
+    "ER-diagram",
+    "gantt",
+    "visualization",
+    "documentation",
+    "markdown",
+    "ASCII",
+    "charts"
+  ],
+  "skills": "./skills"
+}

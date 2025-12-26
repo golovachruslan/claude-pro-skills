@@ -21,6 +21,13 @@
       "version": "2.0.0",
       "source": "./obsidian-plugin",
       "category": "productivity"
+    },
+    {
+      "name": "mermaid",
+      "description": "Create renderer-compatible Mermaid diagrams with human-readable ASCII sidecars",
+      "version": "1.0.0",
+      "source": "./mermaid-plugin",
+      "category": "documentation"
     }
   ]
 }
