@@ -22,9 +22,5 @@
     "iterative-development",
     "skill-enhancement"
   ],
-  "categories": ["productivity", "development"],
-  "components": {
-    "skills": ["skills-improver"],
-    "commands": ["improve-skills", "improve-plugin"]
-  }
+  "commands": "./commands"
 }
