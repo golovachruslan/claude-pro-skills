@@ -1,5 +1,5 @@
 ---
-name: obsidian:format-and-organize
+name: obsidian:format
 description: Complete note processing - format document (clean whitespace, tables, Mermaid) then organize content (extract ideas, improve links, structure)
 argument-hint: "[file-path]"
 allowed-tools:
@@ -12,7 +12,7 @@ allowed-tools:
   - AskUserQuestion
 ---
 
-# Format and Organize Obsidian Note
+# Format Obsidian Note
 
 Complete note processing workflow that combines document formatting with content organization. First cleans up technical formatting issues (whitespace, tables, Mermaid diagrams), then analyzes and organizes the content (extracts ideas, improves links, fixes structure).
 
@@ -356,7 +356,7 @@ Recommendations:
 
 ### Process Current Note
 ```
-/obsidian:format-and-organize
+/obsidian:format
 > Phase 1: Formatting...
 > ✓ Cleaned 12 formatting issues
 > Phase 2: Organizing...
@@ -367,7 +367,7 @@ Recommendations:
 
 ### Process Specific Note
 ```
-/obsidian:format-and-organize "Projects/Website Redesign.md"
+/obsidian:format "Projects/Website Redesign.md"
 > Formatting: Website Redesign.md
 > ✓ Cleaned 2 Mermaid diagrams
 > Organizing: Project note detected
@@ -377,7 +377,7 @@ Recommendations:
 
 ### Process Daily Note
 ```
-/obsidian:format-and-organize "2025-12-31.md"
+/obsidian:format "2025-12-31.md"
 > Formatting complete (6 issues fixed)
 > Daily note detected
 > Extract 2 ideas to permanent notes? [Yes]
@@ -387,7 +387,7 @@ Recommendations:
 
 ### Quick Format Only
 ```
-/obsidian:format-and-organize "Quick Note.md"
+/obsidian:format "Quick Note.md"
 > Formatting: 3 issues fixed
 > No organization opportunities found
 > Note is well-structured!
