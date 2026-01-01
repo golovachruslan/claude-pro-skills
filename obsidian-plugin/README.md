@@ -102,6 +102,17 @@ Analyze and organize any Obsidian note - extract content, create links, and impr
 /obsidian:organize-note "2025-12-25.md"  # Works with daily notes too
 ```
 
+### `/obsidian:format`
+
+Complete note processing - format document (clean whitespace, tables, Mermaid) then organize content (extract ideas, improve links, structure). Combines both formatting and organization in a single workflow.
+
+**Usage**:
+```bash
+/obsidian:format                         # Process current file
+/obsidian:format "path/to/file.md"
+/obsidian:format "2025-12-31.md"         # Works with any note type
+```
+
 ## Skill
 
 The plugin includes an **Obsidian Note Management** skill that automatically activates when you:
@@ -166,6 +177,14 @@ Scans vault for development-related notes and creates organized MOC with links.
 ```
 
 Cleans up formatting, fixes tables, removes extra whitespace.
+
+### Complete Note Processing
+
+```bash
+/obsidian:format "Daily Notes/2025-12-31.md"
+```
+
+Formats the document (cleans whitespace, tables, Mermaid), then organizes content (extracts ideas, improves links, updates structure). Perfect for processing daily notes before archiving.
 
 ## Formatting Scripts
 
@@ -243,6 +262,14 @@ MIT License - See LICENSE file for details
 - Documentation: https://github.com/golovachruslan/claude-pro-skills
 
 ## Changelog
+
+### 2.1.0 (2025-12-31)
+
+- **NEW**: Added `/obsidian:format` command
+  - Combines document formatting with content organization
+  - Two-phase workflow: format first, then organize
+  - Perfect for processing daily notes, imported documents, or general note maintenance
+  - Runs all formatters (whitespace, tables, Mermaid) then organizes content (extracts ideas, improves links, updates structure)
 
 ### 2.0.0 (2025-12-26) - BREAKING CHANGE
 
