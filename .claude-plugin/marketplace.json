@@ -28,6 +28,13 @@
       "version": "1.0.0",
       "source": "./mermaid-plugin",
       "category": "documentation"
+    },
+    {
+      "name": "project-context",
+      "description": "Maintain project context across sessions with structured docs, Mermaid diagrams, and AI agent integration",
+      "version": "1.0.0",
+      "source": "./project-context",
+      "category": "productivity"
     }
   ]
 }
