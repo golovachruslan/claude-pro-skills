@@ -1,7 +1,7 @@
 {
   "name": "project-context",
-  "version": "1.0.0",
-  "description": "Maintain project context across sessions with structured documentation files. Similar to Cline Memory Bank - stores project goals, architecture diagrams, progress, and patterns.",
+  "version": "1.1.0",
+  "description": "Maintain project context across sessions with structured documentation files. Similar to Cline Memory Bank - stores project goals, architecture diagrams, progress, and patterns. Includes intelligent feature/project planning with requirement gathering.",
   "author": {
     "name": "Ruslan Halavach",
     "email": "golovachruslan@gmail.com"
@@ -15,7 +15,10 @@
     "architecture",
     "mermaid",
     "project-management",
-    "knowledge-base"
+    "knowledge-base",
+    "planning",
+    "requirements",
+    "feature-planning"
   ],
   "commands": "./commands",
   "skills": "./skills"

@@ -5,6 +5,7 @@ Maintain project context across Claude Code sessions with structured documentati
 ## Features
 
 - **4 Structured Context Files** - Brief, Architecture, Progress, Patterns
+- **Intelligent Planning** - Feature/project planning with requirement gathering (new in v1.1)
 - **Mermaid Diagrams** - Visual architecture and flow documentation
 - **Multiple Update Sources** - Chat history, code scanning, or manual input
 - **AI Agent Integration** - Auto-updates CLAUDE.md and AGENTS.md
@@ -45,6 +46,50 @@ The plugin creates 4 files in `.project-context/`:
 | `patterns.md` | Established patterns and learnings | As needed |
 
 ## Commands
+
+### `/project-context:plan`
+
+**NEW in v1.1** - Intelligent feature and project planning with systematic requirement gathering:
+
+```bash
+# Start planning a feature or project
+/project-context:plan
+```
+
+The planner skill will:
+1. **Ask clarifying questions** instead of making assumptions (uses AskUserQuestion tool)
+2. **Gather requirements** systematically (functional, technical, design)
+3. **Identify constraints** (performance, security, scale, timeline)
+4. **Create structured plans** with phases, tasks, and deliverables
+5. **Document trade-offs** and design decisions
+6. **Define success criteria** and next steps
+
+The planner excels at:
+- Feature planning (new functionality)
+- Project planning (multi-feature initiatives)
+- Architecture planning (system design)
+- Refactoring planning (technical improvements)
+
+Plans can be saved to `.project-context/plans/[feature-name].md` for reference across sessions.
+
+**Example planning session:**
+```
+User: /project-context:plan
+User: I want to add dark mode to my app
+
+Claude: I need to understand the scope and technical approach for dark mode.
+
+1. Should dark mode be:
+   - System preference based (auto-switch with OS)
+   - Manual toggle only
+   - Both options available?
+
+2. What's the scope:
+   - Entire application
+   - Specific sections only?
+
+[... continues with requirement gathering, then creates structured plan]
+```
 
 ### `/project-context:init`
 
