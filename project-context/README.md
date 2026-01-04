@@ -5,7 +5,8 @@ Maintain project context across Claude Code sessions with structured documentati
 ## Features
 
 - **4 Structured Context Files** - Brief, Architecture, Progress, Patterns
-- **Intelligent Planning** - Feature/project planning with requirement gathering (new in v1.1)
+- **Intelligent Planning** - Feature/project planning with requirement gathering
+- **Retrospective Analysis** - Extract learnings from conversations and preserve insights (new in v1.2)
 - **Mermaid Diagrams** - Visual architecture and flow documentation
 - **Multiple Update Sources** - Chat history, code scanning, or manual input
 - **AI Agent Integration** - Auto-updates CLAUDE.md and AGENTS.md
@@ -46,6 +47,51 @@ The plugin creates 4 files in `.project-context/`:
 | `patterns.md` | Established patterns and learnings | As needed |
 
 ## Commands
+
+### `/project-context:retro`
+
+**NEW in v1.2** - Retrospective analysis to extract and preserve key learnings:
+
+```bash
+# Analyze conversation and capture learnings
+/project-context:retro
+```
+
+The retro skill will:
+1. **Analyze conversation** - Review session for learnings, decisions, patterns, errors
+2. **Extract insights** - Identify valuable knowledge to preserve
+3. **Categorize learnings** - Map insights to appropriate context files
+4. **Propose updates** - Show exactly what will be added and where
+5. **Ask confirmation** - Get user approval before applying changes
+6. **Apply updates** - Add approved content to the right files
+
+The retro excels at capturing:
+- **Key learnings** - What worked, what didn't, new discoveries
+- **Technical decisions** - Architecture choices, library selections, trade-offs
+- **Patterns** - Coding patterns, best practices, anti-patterns to avoid
+- **Solutions** - Bug fixes, debugging insights, error handling approaches
+- **Progress** - Completed features, current work, next steps
+
+**Example retro session:**
+```
+User: /project-context:retro
+
+Claude: I've analyzed our dark mode implementation session. Here are the key learnings:
+
+## Proposed Updates
+
+### 1. patterns.md - Theme Management
+**Insight:** Established pattern for theme switching with Context API
+**Proposed Addition:**
+[Shows exact content to be added]
+
+### 2. progress.md - Recent Completions
+**Insight:** Dark mode feature is complete
+**Proposed Addition:**
+[Shows completion entry]
+
+Do these updates look good? Should I modify anything before applying?
+```
 
 ### `/project-context:plan`
 
