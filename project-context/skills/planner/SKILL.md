@@ -27,23 +27,82 @@ First, identify what type of planning is needed:
 - **Implementation planning** - How to build something specific
 - **Refactoring planning** - How to improve existing code
 
-### 2. Gather Context
+### 2. Gather Context from Project
 
-Before asking questions, gather available context:
+**IMPORTANT:** Always check for existing project context before asking questions. This helps you ask informed, targeted questions instead of generic ones.
 
 ```bash
-# Check for project context
+# Check for project context files (ALWAYS do this first)
 ls .project-context/*.md 2>/dev/null
 
-# Check for relevant documentation
+# Check for other documentation
 ls README.md CLAUDE.md docs/ 2>/dev/null
 ```
 
-Read relevant context files to understand:
-- Current architecture
-- Established patterns
-- Tech stack
-- Project goals
+#### If `.project-context/` exists:
+
+Read the context files to understand the current project state:
+
+**Read `.project-context/brief.md`** to understand:
+- Project goals and vision
+- Target users
+- Core requirements
+- Project scope
+
+**Read `.project-context/architecture.md`** to understand:
+- Current tech stack
+- System architecture (components, integrations)
+- Technology choices and rationale
+- Mermaid diagrams showing flows
+
+**Read `.project-context/patterns.md`** to understand:
+- Established coding patterns
+- Conventions and standards
+- Learnings from past decisions
+
+**Read `.project-context/progress.md`** to understand:
+- Current development phase
+- Recent work completed
+- Ongoing work
+- Known issues or blockers
+
+#### How to Use Context in Planning
+
+With context available, your questions become more specific:
+
+**Without context:**
+```
+What tech stack do you want to use?
+```
+
+**With context (after reading architecture.md):**
+```
+I see you're using React + Node.js + PostgreSQL. For this feature:
+1. Should the new API endpoints follow the same Express routing pattern?
+2. Does this need a new database table, or extend existing ones?
+```
+
+**Without context:**
+```
+What are the requirements?
+```
+
+**With context (after reading brief.md):**
+```
+I see the project goal is [X] for [target users]. For this feature:
+1. How does this align with the core goal?
+2. Which user segment benefits most?
+```
+
+#### If No Context Exists
+
+If `.project-context/` doesn't exist, ask broader questions:
+- Tech stack preferences
+- Project goals and vision
+- Target users
+- Architectural preferences
+
+Then suggest: "Would you like me to initialize project context with `/project-context:init` to track this information for future planning?"
 
 ### 3. Identify Knowledge Gaps
 
@@ -268,6 +327,53 @@ I need to understand the scope and technical approach for dark mode.
 This will help me plan the implementation approach and identify which components need updates.
 ```
 
+### Example 1A: Feature Planning with Project Context
+
+**User:** "I want to add dark mode to my app"
+
+**Assistant first checks context:**
+```bash
+ls .project-context/*.md
+# Found: brief.md, architecture.md, patterns.md
+```
+
+**Assistant reads architecture.md and sees:**
+- React + Tailwind CSS frontend
+- Using Context API for state management
+- Design system in `src/theme/` directory
+
+**Assistant uses AskUserQuestion with context-aware questions:**
+```
+I checked your project context and see you're using React with Tailwind CSS and Context API for state management.
+
+For implementing dark mode, I need to clarify:
+
+1. Theme approach:
+   - Extend existing Tailwind dark mode classes?
+   - Or customize the theme in tailwind.config.js?
+
+2. State management:
+   - Add theme state to existing Context API setup?
+   - Or create a new ThemeContext?
+
+3. Design system integration:
+   - I see you have a theme directory. Should dark mode colors:
+     - Extend the existing theme/colors.js file?
+     - Be a separate dark-theme configuration?
+
+4. Persistence:
+   - Local storage (browser-only)
+   - User profile (I see you have user authentication)?
+
+This will help me create a plan that fits your existing architecture.
+```
+
+**This is better than Example 1 because:**
+- References specific tech stack (React, Tailwind)
+- Mentions existing architecture (Context API, theme directory)
+- Asks about integration with existing patterns
+- Shows the assistant did homework
+
 ### Example 2: Project Planning
 
 **User:** "Help me plan a task management app"
@@ -385,10 +491,37 @@ What's the priority order? This will help me design the architecture and plan ph
 
 ## Integration with Project Context
 
-### Before Planning
-1. Check `.project-context/architecture.md` for current architecture
-2. Check `.project-context/patterns.md` for established patterns
-3. Check `.project-context/progress.md` for ongoing work that might conflict
+### Before Planning (MANDATORY)
+
+**Always check for project context first** - this is critical for effective planning.
+
+1. **Check if context exists:**
+   ```bash
+   ls .project-context/*.md 2>/dev/null
+   ```
+
+2. **If exists, read all relevant files:**
+   - `.project-context/brief.md` - Project goals, users, scope
+   - `.project-context/architecture.md` - Tech stack, system design, diagrams
+   - `.project-context/patterns.md` - Coding patterns, conventions, learnings
+   - `.project-context/progress.md` - Current work, blockers, recent changes
+
+3. **Use context to inform questions:**
+   - Reference existing architecture in questions
+   - Ask about consistency with established patterns
+   - Check for conflicts with ongoing work
+   - Build on existing technology choices
+
+4. **Example workflow:**
+   ```
+   1. User: "I want to add user notifications"
+   2. Read .project-context/architecture.md
+   3. See: "Using Express REST API with PostgreSQL and React frontend"
+   4. Ask: "I see you're using Express + PostgreSQL. Should notifications:
+      - Use REST endpoints or add WebSocket support?
+      - Store in new notifications table or extend users table?
+      - Integrate with existing auth middleware?"
+   ```
 
 ### After Planning
 1. Offer to save plan to `.project-context/plans/[name].md`
