@@ -128,7 +128,101 @@ graph TD
 - Document what worked/didn't work
 - Add key insights
 
-### Step 5: Add Timestamp
+### Step 5: Refresh Managed Configuration Sections
+
+After updating context files, refresh managed sections in CLAUDE.md and AGENTS.md (if they exist).
+
+#### Refresh CLAUDE.md
+
+Check if CLAUDE.md exists and has managed section:
+```bash
+grep -q "<!-- PROJECT-CONTEXT:START -->" CLAUDE.md 2>/dev/null
+```
+
+If managed section exists, update the content between markers with latest instructions:
+
+```bash
+# Extract everything before managed section
+sed -n '1,/<!-- PROJECT-CONTEXT:START -->/p' CLAUDE.md | head -n -1 > /tmp/claude_before.md
+
+# Extract everything after managed section
+sed -n '/<!-- PROJECT-CONTEXT:END -->/,$p' CLAUDE.md | tail -n +2 > /tmp/claude_after.md
+
+# Combine with refreshed managed content
+cat /tmp/claude_before.md > CLAUDE.md
+cat << 'EOF' >> CLAUDE.md
+
+<!-- PROJECT-CONTEXT:START -->
+## Project Context
+
+These instructions are for AI assistants working in this project.
+
+Always read `.project-context/` files when starting work to understand:
+- Project goals and scope (`brief.md`)
+- System architecture and flows (`architecture.md`)
+- Current status and blockers (`progress.md`)
+- Established patterns and learnings (`patterns.md`)
+
+Use these files to:
+- Understand project constraints before making changes
+- Follow established patterns and conventions
+- Avoid duplicate work or conflicting approaches
+- Maintain consistency with project goals
+
+Keep this managed block so project-context commands can refresh the instructions.
+
+<!-- PROJECT-CONTEXT:END -->
+EOF
+cat /tmp/claude_after.md >> CLAUDE.md
+rm /tmp/claude_before.md /tmp/claude_after.md
+```
+
+#### Refresh AGENTS.md
+
+Check if AGENTS.md exists and has managed section:
+```bash
+grep -q "<!-- PROJECT-CONTEXT:START -->" AGENTS.md 2>/dev/null
+```
+
+If managed section exists, update similarly:
+
+```bash
+# Extract everything before managed section
+sed -n '1,/<!-- PROJECT-CONTEXT:START -->/p' AGENTS.md | head -n -1 > /tmp/agents_before.md
+
+# Extract everything after managed section
+sed -n '/<!-- PROJECT-CONTEXT:END -->/,$p' AGENTS.md | tail -n +2 > /tmp/agents_after.md
+
+# Combine with refreshed managed content
+cat /tmp/agents_before.md > AGENTS.md
+cat << 'EOF' >> AGENTS.md
+
+<!-- PROJECT-CONTEXT:START -->
+## Project Context
+
+These instructions are for AI agents working in this project.
+
+Before executing tasks, read `.project-context/` files:
+- `brief.md` - Understand project scope and goals
+- `architecture.md` - Review system design and flows
+- `progress.md` - Check current status and blockers
+- `patterns.md` - Follow established patterns
+
+Use these files to:
+- Align work with project goals
+- Apply established architecture patterns
+- Avoid conflicts with current work
+- Make context-aware decisions
+
+Keep this managed block so project-context commands can refresh the instructions.
+
+<!-- PROJECT-CONTEXT:END -->
+EOF
+cat /tmp/agents_after.md >> AGENTS.md
+rm /tmp/agents_before.md /tmp/agents_after.md
+```
+
+### Step 6: Add Timestamp
 
 Each updated file should have its "Last updated" line modified:
 
@@ -137,10 +231,11 @@ Each updated file should have its "Last updated" line modified:
 *Last updated: YYYY-MM-DD HH:MM*
 ```
 
-### Step 6: Show Summary
+### Step 7: Show Summary
 
 Display:
-- Files updated
+- Context files updated
+- Configuration files refreshed (CLAUDE.md, AGENTS.md)
 - Key changes made
 - Diff preview (truncated if large)
 

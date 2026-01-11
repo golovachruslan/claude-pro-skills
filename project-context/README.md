@@ -9,7 +9,8 @@ Maintain project context across Claude Code sessions with structured documentati
 - **Retrospective Analysis** - Extract learnings from conversations and preserve insights (new in v1.2)
 - **Mermaid Diagrams** - Visual architecture and flow documentation
 - **Multiple Update Sources** - Chat history, code scanning, or manual input
-- **AI Agent Integration** - Auto-updates CLAUDE.md and AGENTS.md
+- **AI Agent Integration** - Auto-updates CLAUDE.md and AGENTS.md with managed sections
+- **OpenSpec-Aligned** - Uses HTML comment markers for managed configuration sections
 - **Validation** - Check completeness and freshness
 
 ## Installation
@@ -205,25 +206,67 @@ sequenceDiagram
 
 ## AI Agent Integration
 
-When initialized, the plugin adds context references to:
+Following OpenSpec conventions, the plugin uses **managed configuration sections** in CLAUDE.md and AGENTS.md. These sections are delimited by HTML comment markers and can be automatically refreshed by project-context commands.
+
+### Managed Sections
+
+When initialized, the plugin adds managed sections using markers:
 
 **CLAUDE.md:**
 ```markdown
+<!-- PROJECT-CONTEXT:START -->
 ## Project Context
-This project uses structured context files in `.project-context/`:
-- See `.project-context/brief.md` for project goals
-- See `.project-context/architecture.md` for system diagrams
-- See `.project-context/progress.md` for current status
-- See `.project-context/patterns.md` for patterns and learnings
 
-When starting work, read these files to understand project state.
+These instructions are for AI assistants working in this project.
+
+Always read `.project-context/` files when starting work to understand:
+- Project goals and scope (`brief.md`)
+- System architecture and flows (`architecture.md`)
+- Current status and blockers (`progress.md`)
+- Established patterns and learnings (`patterns.md`)
+
+Use these files to:
+- Understand project constraints before making changes
+- Follow established patterns and conventions
+- Avoid duplicate work or conflicting approaches
+- Maintain consistency with project goals
+
+Keep this managed block so project-context commands can refresh the instructions.
+
+<!-- PROJECT-CONTEXT:END -->
 ```
 
 **AGENTS.md:**
 ```markdown
+<!-- PROJECT-CONTEXT:START -->
 ## Project Context
-Before executing tasks, agents should read `.project-context/` files.
+
+These instructions are for AI agents working in this project.
+
+Before executing tasks, read `.project-context/` files:
+- `brief.md` - Understand project scope and goals
+- `architecture.md` - Review system design and flows
+- `progress.md` - Check current status and blockers
+- `patterns.md` - Follow established patterns
+
+Use these files to:
+- Align work with project goals
+- Apply established architecture patterns
+- Avoid conflicts with current work
+- Make context-aware decisions
+
+Keep this managed block so project-context commands can refresh the instructions.
+
+<!-- PROJECT-CONTEXT:END -->
 ```
+
+### Benefits of Managed Sections
+
+1. **Automatic Updates** - `/project-context:update` refreshes managed content
+2. **User Content Protected** - Content outside markers is never modified
+3. **Consistent Configuration** - Same structure across all projects
+4. **OpenSpec Compatible** - Uses same pattern as OpenSpec and other tools
+5. **Idempotent** - Safe to run init/update multiple times
 
 ## Best Practices
 

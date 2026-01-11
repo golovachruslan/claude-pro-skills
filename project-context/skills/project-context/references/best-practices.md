@@ -227,6 +227,37 @@ Consider updating when:
 - Reference specific files for specific tasks
 - Keep agent instructions high-level
 
+### Managed Configuration Sections
+
+Following OpenSpec conventions, project-context uses **HTML comment markers** to delimit managed sections in CLAUDE.md and AGENTS.md:
+
+```markdown
+<!-- PROJECT-CONTEXT:START -->
+## Project Context
+
+[Auto-managed content]
+
+<!-- PROJECT-CONTEXT:END -->
+```
+
+**Key principles:**
+1. **Managed sections** - Content between markers is auto-updated by project-context commands
+2. **User sections** - Content outside markers is never modified
+3. **Refresh on update** - `/project-context:update` refreshes managed sections with latest instructions
+4. **Idempotent** - Safe to run init/update multiple times
+
+**Benefits:**
+- Consistent configuration across projects
+- Automatic updates when conventions evolve
+- Clear separation between managed and custom content
+- Compatible with other tools using similar patterns (e.g., OpenSpec)
+
+**Commands that manage sections:**
+- `/project-context:init` - Creates managed sections in CLAUDE.md/AGENTS.md
+- `/project-context:update` - Refreshes managed sections with latest content
+
+**Marker format:** `<!-- PROJECT-CONTEXT:START -->` and `<!-- PROJECT-CONTEXT:END -->`
+
 ### With Version Control
 - Commit context files with code changes
 - Review context changes in PRs
