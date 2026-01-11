@@ -2,6 +2,28 @@
 
 Maintain project context across Claude Code sessions with structured documentation files. Similar to [Cline Memory Bank](https://docs.cline.bot/prompting/cline-memory-bank) - stores project goals, architecture diagrams, progress, and patterns.
 
+## Why Use Project Context?
+
+### Token Efficiency in Monorepos
+
+In large monorepos, AI agents often waste significant tokens exploring the codebase to understand project structure, goals, and patterns. With `.project-context/`, agents get immediate access to curated, high-signal information:
+
+- **Reduced exploration** - No need to scan dozens of files to understand the project
+- **Faster onboarding** - New sessions start with full context immediately
+- **Lower costs** - Fewer tokens spent on context gathering means more tokens for actual work
+- **Consistent understanding** - Every agent session starts with the same accurate context
+
+### Easy to Share
+
+The `.project-context/` folder is completely self-contained:
+
+- **Copy & paste** - Share context with teammates by copying the folder
+- **Zip & send** - Archive and send to collaborators or new team members
+- **Git-friendly** - Commit to repository for version-controlled context
+- **Cross-tool compatible** - Works with any AI tool that reads markdown files
+
+This makes onboarding new developers or AI agents trivial - just point them to `.project-context/` and they have everything they need.
+
 ## Features
 
 - **4 Structured Context Files** - Brief, Architecture, Progress, Patterns
