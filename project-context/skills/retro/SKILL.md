@@ -355,7 +355,7 @@ Should I:
 
 ### Example 1: After Implementing a Feature
 
-**User:** "/retro" (after completing dark mode feature)
+**User:** "/project-context:retro" (after completing dark mode feature)
 
 **Assistant analyzes and proposes:**
 ```markdown
@@ -413,7 +413,7 @@ Do these updates look good? Should I modify anything before applying?
 
 ### Example 2: After Debugging Session
 
-**User:** "/retro" (after fixing complex async bug)
+**User:** "/project-context:retro" (after fixing complex async bug)
 
 **Assistant analyzes and proposes:**
 ```markdown
@@ -458,7 +458,7 @@ Does this accurately capture the learning?
 
 ### Example 3: Architecture Decision
 
-**User:** "/retro" (after choosing database solution)
+**User:** "/project-context:retro" (after choosing database solution)
 
 **Assistant analyzes and proposes:**
 ```markdown
