@@ -168,20 +168,38 @@ Check if CLAUDE.md exists in project root:
 ls CLAUDE.md 2>/dev/null
 ```
 
-If exists, append the following section (if not already present):
+If exists, check if managed section already present:
+```bash
+grep -q "<!-- PROJECT-CONTEXT:START -->" CLAUDE.md 2>/dev/null
+```
+
+If managed section does NOT exist, append the following:
 
 ```markdown
 
+<!-- PROJECT-CONTEXT:START -->
 ## Project Context
 
-This project uses structured context files in `.project-context/`:
-- See `.project-context/brief.md` for project goals and scope
-- See `.project-context/architecture.md` for system diagrams and flows
-- See `.project-context/progress.md` for current status and blockers
-- See `.project-context/patterns.md` for established patterns and learnings
+These instructions are for AI assistants working in this project.
 
-When starting work, read these files to understand project state.
+Always read `.project-context/` files when starting work to understand:
+- Project goals and scope (`brief.md`)
+- System architecture and flows (`architecture.md`)
+- Current status and blockers (`progress.md`)
+- Established patterns and learnings (`patterns.md`)
+
+Use these files to:
+- Understand project constraints before making changes
+- Follow established patterns and conventions
+- Avoid duplicate work or conflicting approaches
+- Maintain consistency with project goals
+
+Keep this managed block so project-context commands can refresh the instructions.
+
+<!-- PROJECT-CONTEXT:END -->
 ```
+
+If managed section ALREADY exists, inform user that CLAUDE.md already has project-context configuration.
 
 #### Update AGENTS.md (if exists)
 
@@ -190,18 +208,38 @@ Check if AGENTS.md exists:
 ls AGENTS.md 2>/dev/null
 ```
 
-If exists, append:
+If exists, check if managed section already present:
+```bash
+grep -q "<!-- PROJECT-CONTEXT:START -->" AGENTS.md 2>/dev/null
+```
+
+If managed section does NOT exist, append the following:
 
 ```markdown
 
+<!-- PROJECT-CONTEXT:START -->
 ## Project Context
 
-Before executing tasks, agents should read `.project-context/` files:
+These instructions are for AI agents working in this project.
+
+Before executing tasks, read `.project-context/` files:
 - `brief.md` - Understand project scope and goals
 - `architecture.md` - Review system design and flows
 - `progress.md` - Check current status and blockers
 - `patterns.md` - Follow established patterns
+
+Use these files to:
+- Align work with project goals
+- Apply established architecture patterns
+- Avoid conflicts with current work
+- Make context-aware decisions
+
+Keep this managed block so project-context commands can refresh the instructions.
+
+<!-- PROJECT-CONTEXT:END -->
 ```
+
+If managed section ALREADY exists, inform user that AGENTS.md already has project-context configuration.
 
 ### Step 6: Confirmation
 
