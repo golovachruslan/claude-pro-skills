@@ -268,28 +268,42 @@ Once you have sufficient information, create a comprehensive plan:
 
 ### 7. Save Plan to Context
 
-**Always ask the user** if they want to save the plan using AskUserQuestion:
+**Always ask the user** if they want to save the plan using AskUserQuestion.
+
+#### Filename Selection
+
+**If user provided a feature name during planning:**
+- Use the provided name directly (convert to hyphen-case)
+- Example: "Dark Mode Toggle" → `dark-mode-toggle.md`
+- Confirm with user: "I'll save this as `dark-mode-toggle.md`. Is that OK?"
+
+**If no explicit feature name was provided:**
+- Generate 2-3 descriptive filename options based on the plan content
+- Ask user to choose or provide their own:
 
 ```markdown
 Would you like me to save this plan?
 
-Default location: `.project-context/plans/[feature-name].md`
+Suggested filenames:
+1. user-authentication-flow.md
+2. auth-feature-implementation.md
+3. login-system-plan.md
 
 Options:
-1. Yes, save to default location
-2. Yes, save to a different location: [specify path]
-3. No, don't save
+- Enter 1, 2, or 3 to use a suggested name
+- Type your own filename
+- Type "no" to skip saving
 ```
 
-#### If User Confirms (Options 1 or 2):
+#### If User Confirms:
 
 1. **Create plans directory** (if it doesn't exist):
    ```bash
    mkdir -p .project-context/plans
    ```
 
-2. **Save the plan** with descriptive filename:
-   - Use hyphen-case for filename: `dark-mode-implementation.md`, `user-auth-feature.md`
+2. **Save the plan** with selected filename:
+   - Convert to hyphen-case if needed
    - Include plan header with metadata (Status, Created, Last Updated)
 
 3. **Update progress.md** to reference the new plan:
@@ -298,7 +312,7 @@ Options:
    - [Feature Name](./plans/feature-name.md) - Planning phase
    ```
 
-#### If User Declines (Option 3):
+#### If User Declines:
 
 Simply acknowledge and move on. The plan is still visible in the conversation.
 
@@ -551,10 +565,11 @@ What's the priority order? This will help me design the architecture and plan ph
 
 ### After Planning
 1. **Always ask user for confirmation** before saving plan
-2. Default save location: `.project-context/plans/[name].md`
-3. If user confirms, create plans directory and save plan
-4. Update `.project-context/progress.md` to reference the plan
-5. Update `.project-context/architecture.md` if architecture changes
+2. **Propose filename options** or use user-provided feature name
+3. Default save location: `.project-context/plans/[name].md`
+4. If user confirms, create plans directory and save plan
+5. Update `.project-context/progress.md` to reference the plan
+6. Update `.project-context/architecture.md` if architecture changes
 
 ### Plan File Structure
 ```markdown
