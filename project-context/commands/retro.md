@@ -13,4 +13,4 @@ Then:
 - Ask for user confirmation before applying changes
 - Apply approved updates while maintaining existing file structure
 
-Use the retro skill to systematically extract and preserve valuable insights from this session.
+Use the `project-context:retro` skill to systematically extract and preserve valuable insights from this session.

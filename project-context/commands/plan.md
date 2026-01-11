@@ -11,7 +11,7 @@ allowed-tools:
 
 # Plan Feature or Project
 
-Help me plan this feature or project. Use the planner skill to:
+Help me plan this feature or project. Use the `project-context:planner` skill to:
 
 1. Gather requirements through clarifying questions (never assume or guess)
 2. Understand technical constraints and preferences
