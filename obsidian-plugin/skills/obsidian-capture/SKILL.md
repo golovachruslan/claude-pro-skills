@@ -1,5 +1,5 @@
 ---
-name: obsidian-claude-capture
+name: obsidian-capture
 description: Capture Claude Code conversations to Obsidian vault. Use when user says "capture this conversation", "save chat to obsidian", "log this session", "export conversation", "save to vault", "capture insights", or wants to preserve Claude Code discussion as notes. Supports finding and updating related existing notes.
 version: 1.0.0
 allowed-tools:

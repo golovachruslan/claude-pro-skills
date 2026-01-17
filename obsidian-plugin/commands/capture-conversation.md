@@ -5,7 +5,7 @@ description: Capture the current Claude Code conversation to Obsidian vault as s
 
 # Capture Conversation to Obsidian
 
-Invoke the `obsidian-claude-capture` skill to capture this conversation.
+Invoke the `obsidian-capture` skill to capture this conversation.
 
 ## Workflow
 
