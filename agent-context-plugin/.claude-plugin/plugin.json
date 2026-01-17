@@ -1,0 +1,25 @@
+{
+  "name": "agent-context",
+  "version": "1.0.0",
+  "description": "Captures and saves agent conversation context with key points and learnings to .agent-context folder. Useful for transferring context between agent sessions or maintaining conversation history.",
+  "author": {
+    "name": "Claude Pro Skills",
+    "email": "skills@anthropic.com"
+  },
+  "repository": "https://github.com/golovachruslan/claude-pro-skills",
+  "license": "MIT",
+  "keywords": [
+    "context",
+    "conversation",
+    "capture",
+    "save",
+    "agent",
+    "memory",
+    "handoff",
+    "session",
+    "learnings",
+    "knowledge-transfer",
+    "context-sharing"
+  ],
+  "commands": "./commands"
+}
