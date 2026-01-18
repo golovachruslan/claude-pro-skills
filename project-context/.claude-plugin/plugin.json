@@ -1,7 +1,7 @@
 {
   "name": "project-context",
-  "version": "1.3.0",
-  "description": "Maintain project context across sessions with structured documentation files. Similar to Cline Memory Bank - stores project goals, architecture diagrams, progress, and patterns. Includes intelligent planning with save confirmation, plan implementation, and retrospective analysis to capture learnings.",
+  "version": "1.4.0",
+  "description": "Maintain project context across sessions with structured documentation files. Similar to Cline Memory Bank - stores project goals, architecture diagrams, progress, and patterns. Includes intelligent planning with save confirmation, plan implementation, and retrospective analysis to capture learnings. Features specialized subagents for parallel codebase exploration.",
   "author": {
     "name": "Ruslan Halavach",
     "email": "golovachruslan@gmail.com"
@@ -22,8 +22,13 @@
     "implementation",
     "retrospective",
     "learnings",
-    "insights"
+    "insights",
+    "subagents",
+    "codebase-exploration",
+    "dependency-analysis",
+    "conventions"
   ],
   "commands": "./commands",
-  "skills": "./skills"
+  "skills": "./skills",
+  "agents": "./agents"
 }
