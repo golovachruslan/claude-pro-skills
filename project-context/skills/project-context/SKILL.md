@@ -125,6 +125,72 @@ If CLAUDE.md exists, it should reference the context files. Read both for comple
 If context seems stale (>7 days old with active development):
 - Suggest: "Project context may be outdated. Run `/project-context:update --scan` to refresh."
 
+## Generating Context from Codebase
+
+When no context exists or user wants to analyze a new codebase, use subagents for parallel exploration.
+
+### When to Use Subagents
+
+- User says "analyze this codebase", "scan the project", "generate context"
+- No `.project-context/` directory exists
+- User wants fresh analysis regardless of existing context
+- Starting work on unfamiliar codebase
+
+### Parallel Exploration Phase
+
+Spawn these subagents simultaneously using the Task tool:
+
+```
+1. codebase-explorer    → Structure, entry points, tech stack
+2. dependency-analyzer  → Imports, external deps, integrations
+3. convention-detector  → Naming, patterns, coding standards
+```
+
+Example Task tool usage:
+```
+Task(subagent: "codebase-explorer", prompt: "Scan this codebase and report structure, tech stack, and entry points")
+Task(subagent: "dependency-analyzer", prompt: "Analyze dependencies and import relationships")
+Task(subagent: "convention-detector", prompt: "Extract coding conventions and patterns")
+```
+
+### Synthesis Phase
+
+After parallel exploration completes, use architecture-documenter:
+
+```
+Task(subagent: "architecture-documenter", prompt: "Synthesize findings into documentation: [explorer results], [analyzer results], [detector results]")
+```
+
+### Output Options
+
+Based on user preference:
+
+| Request | Action |
+|---------|--------|
+| "Generate CLAUDE.md" | Write findings to CLAUDE.md |
+| "Initialize context" | Create `.project-context/` files |
+| "Just tell me" | Summarize findings in response |
+| "Full docs" | Generate both CLAUDE.md and ARCHITECTURE.md |
+
+### Workflow Decision Tree
+
+```
+User asks about project context
+           │
+           ▼
+   .project-context/ exists?
+      │           │
+     YES          NO
+      │           │
+      ▼           ▼
+  Read existing   Use subagents
+  context files   to analyze
+      │           │
+      ▼           ▼
+  Synthesize     Generate new
+  response       context files
+```
+
 ## Reference Files
 
 For detailed templates and best practices, see:
