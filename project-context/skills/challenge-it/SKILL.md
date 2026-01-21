@@ -412,4 +412,7 @@ Would you like me to document this in the challenge log as "accepted with mitiga
 ## Reference
 
 For domain-specific critics (brutal mode), see:
-- `references/critic-frameworks.md` — Extended perspectives for Security, Performance, UX, Data, etc.
+- `references/critic-frameworks.md` — Index with selection matrix and guidelines
+- `references/domain-critics/` — Individual critic files:
+  - `security.md`, `performance.md`, `ux.md`, `data.md`
+  - `operations.md`, `testing.md`, `cost.md`, `api.md`, `concurrency.md`
