@@ -7,9 +7,28 @@ allowed-tools:
   - Write
   - Glob
   - Grep
+  - Task
 ---
 
 # Plan Feature or Project
+
+## Task Tool Usage
+
+**Check if your available tools include `Task`.** If you have access to the Task tool, use Task subagents for:
+
+- **Codebase exploration**: Use `subagent_type=Explore` to understand existing code structure, find relevant files, and gather technical context
+- **Complex research**: Use `subagent_type=Plan` for designing implementation strategies when the feature is architecturally complex
+
+Example usage:
+```
+Task(subagent_type="Explore", prompt="Find all authentication-related files and understand the current auth patterns in use")
+```
+
+Using Task subagents allows parallel exploration of multiple codebase areas, reduces context usage, and provides more thorough analysis for planning.
+
+**If `Task` is not in your available tools**, proceed with direct Glob/Grep/Read operations as fallback.
+
+---
 
 Help me plan this feature or project. Use the `project-context:planner` skill to:
 
