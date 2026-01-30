@@ -1,7 +1,7 @@
 {
   "name": "obsidian",
-  "version": "2.2.0",
-  "description": "Obsidian note management with PARA method, MOCs, conversation capture, and formatting tools for knowledge workers",
+  "version": "2.3.0",
+  "description": "Obsidian note management with PARA method, MOCs, canvas creation, bases/databases, conversation capture, and formatting tools for knowledge workers",
   "author": {
     "name": "Ruslan Halavach"
   },
@@ -19,7 +19,15 @@
     "moc",
     "conversation-capture",
     "chat-export",
-    "session-logging"
+    "session-logging",
+    "canvas",
+    "mind-map",
+    "visual",
+    "bases",
+    "database",
+    "views",
+    "filters",
+    "formulas"
   ],
   "commands": "./commands",
   "skills": "./skills"

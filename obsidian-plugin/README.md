@@ -1,6 +1,6 @@
 # Obsidian Plugin for Claude Code
 
-Comprehensive Obsidian note management with PARA method, Maps of Content, and formatting tools.
+Comprehensive Obsidian note management with PARA method, Maps of Content, Canvas creation, Bases databases, and formatting tools.
 
 ## Overview
 
@@ -11,6 +11,8 @@ This plugin helps you create and organize notes in Obsidian vaults using proper 
 - **Smart Note Creation**: Interactive note creation with templates for different note types (projects, areas, resources, MOCs, daily notes)
 - **PARA Method Support**: Built-in support for Projects, Areas, Resources, and Archives organization
 - **Maps of Content**: Easily create and manage MOCs to organize knowledge
+- **Canvas Creation**: Generate visual mind maps and diagrams as `.canvas` files
+- **Bases/Databases**: Create dynamic views of vault notes with filters, formulas, and multiple view types
 - **Document Formatting**: Clean up imported documents with automated formatting scripts
 - **Daily Note Processing**: Extract permanent notes from daily notes and maintain your vault
 - **Best Practices**: Guidance on linking strategies, frontmatter, tags, and vault organization
@@ -113,22 +115,68 @@ Complete note processing - format document (clean whitespace, tables, Mermaid) t
 /obsidian:format "2025-12-31.md"         # Works with any note type
 ```
 
-## Skill
+### `/obsidian:create-canvas`
 
-The plugin includes an **Obsidian Note Management** skill that automatically activates when you:
+Create visual mind maps and diagrams as Obsidian Canvas files.
 
-- Ask to create Obsidian notes
-- Mention PARA method, MOCs, or daily notes
-- Request help with wikilinks, embeds, or callouts
-- Work with Obsidian-specific features
+**Usage**:
+```bash
+/obsidian:create-canvas "machine learning concepts"  # Mind map
+/obsidian:create-canvas "project timeline Q1"        # Timeline visualization
+/obsidian:create-canvas "organize research notes"    # Freeform layout
+```
 
-The skill provides comprehensive guidance on:
+**Layout types**:
+- **MindMap**: Hierarchical radial layout from central concept
+- **Freeform**: Flexible positioning for complex relationships
 
+### `/obsidian:create-base`
+
+Create dynamic database views of your vault notes with filters, formulas, and multiple view types.
+
+**Usage**:
+```bash
+/obsidian:create-base "track projects with status"   # Project tracker
+/obsidian:create-base "reading list with ratings"    # Book database
+/obsidian:create-base "tasks grouped by project"     # Task dashboard
+```
+
+**View types**: table, cards, list, map
+
+## Skills
+
+The plugin includes several skills that automatically activate based on context:
+
+### Obsidian Note Management
+
+Activates when you ask to create notes, mention PARA method, MOCs, daily notes, wikilinks, embeds, or callouts.
+
+Provides guidance on:
 - Obsidian Markdown syntax (wikilinks, embeds, callouts, frontmatter)
 - PARA method and other organization systems
 - Maps of Content creation and management
 - Linking strategies and vault organization
-- Tags, frontmatter, and metadata best practices
+
+### Obsidian Canvas
+
+Activates when you ask to create a canvas, mind map, visual diagram, or organize information visually.
+
+Provides:
+- JSON Canvas Spec 1.0 compliant file generation
+- MindMap and freeform layout algorithms
+- Node types: text, file, link, group
+- Edge connections with styling options
+
+### Obsidian Bases
+
+Activates when you ask to create a base, database view, filter notes, or create formulas.
+
+Provides:
+- YAML-based `.base` file generation
+- Multiple view types (table, cards, list, map)
+- Filter syntax with logical operators
+- Formula functions for computed properties
+- Summary aggregations
 
 ## Examples
 
@@ -262,6 +310,26 @@ MIT License - See LICENSE file for details
 - Documentation: https://github.com/golovachruslan/claude-pro-skills
 
 ## Changelog
+
+### 2.3.0 (2026-01-30)
+
+- **NEW**: Added Canvas skill (`obsidian-canvas`)
+  - Create visual mind maps and diagrams as `.canvas` files
+  - JSON Canvas Spec 1.0 compliant output
+  - MindMap layout for hierarchical content
+  - Freeform layout for complex relationships
+  - Node types: text, file, link, group
+  - Full edge styling support
+
+- **NEW**: Added Bases skill (`obsidian-bases`)
+  - Create dynamic database views as `.base` files
+  - Multiple view types: table, cards, list, map
+  - Filter notes with complex expressions
+  - Formula properties for computed values
+  - Summary aggregations (sum, average, count, etc.)
+
+- **NEW**: Added `/obsidian:create-canvas` command
+- **NEW**: Added `/obsidian:create-base` command
 
 ### 2.1.0 (2025-12-31)
 
