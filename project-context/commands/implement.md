@@ -16,6 +16,28 @@ allowed-tools:
 
 Execute an implementation plan step by step, tracking progress and asking for guidance when needed.
 
+## Task Tool Usage
+
+**Before starting implementation, check if the `Task` tool is available.**
+
+If the Task tool is available, prefer using it for:
+- **Codebase exploration**: Use `subagent_type=Explore` to understand existing patterns, find related code, and gather context before making changes
+- **Parallel implementation**: Launch multiple Task agents for independent tasks within a phase to speed up implementation
+- **Complex sub-tasks**: Delegate multi-step sub-tasks to specialized agents
+
+Example usage:
+```
+Task(subagent_type="Explore", prompt="Find all places where user preferences are stored and understand the data flow")
+Task(subagent_type="Bash", prompt="Run the test suite and report any failures")
+```
+
+Benefits of using Task tool:
+- Parallel execution of independent tasks
+- Reduced context usage for complex operations
+- Specialized agents for different task types (Explore, Bash, Plan)
+
+**If Task tool is NOT available**, proceed with direct tool operations (Glob, Grep, Read, Bash) as fallback.
+
 ## Usage
 
 ```
