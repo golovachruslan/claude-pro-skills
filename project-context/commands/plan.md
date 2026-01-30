@@ -14,9 +14,8 @@ allowed-tools:
 
 ## Task Tool Usage
 
-**Before starting planning, check if the `Task` tool is available.**
+**Check if your available tools include `Task`.** If you have access to the Task tool, use Task subagents for:
 
-If the Task tool is available, prefer using it for:
 - **Codebase exploration**: Use `subagent_type=Explore` to understand existing code structure, find relevant files, and gather technical context
 - **Complex research**: Use `subagent_type=Plan` for designing implementation strategies when the feature is architecturally complex
 
@@ -25,9 +24,9 @@ Example usage:
 Task(subagent_type="Explore", prompt="Find all authentication-related files and understand the current auth patterns in use")
 ```
 
-Using Task tool agents allows parallel exploration of multiple codebase areas, reduces context usage, and provides more thorough analysis for planning.
+Using Task subagents allows parallel exploration of multiple codebase areas, reduces context usage, and provides more thorough analysis for planning.
 
-**If Task tool is NOT available**, proceed with direct Glob/Grep/Read operations as fallback.
+**If `Task` is not in your available tools**, proceed with direct Glob/Grep/Read operations as fallback.
 
 ---
 
