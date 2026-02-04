@@ -578,7 +578,8 @@ What's the priority order? This will help me design the architecture and plan ph
 4. If user confirms, create plans directory and save plan
 5. Update `.project-context/progress.md` to reference the plan
 6. Update `.project-context/architecture.md` if architecture changes
-7. **Run plan verification** using the `plan-verification` skill to ensure quality
+
+Plan verification runs automatically after saving (via skill hook).
 
 ### Plan File Structure
 ```markdown
@@ -616,23 +617,6 @@ You've done good planning when:
 - ✅ Scope is clearly defined (including what's NOT included)
 - ✅ Plan fits within project architecture and patterns
 - ✅ User has confidence in the approach
-
-## Plan Verification
-
-After saving a plan, run verification to ensure quality:
-
-```bash
-python project-context/skills/plan-verification/scripts/validate_plan.py .project-context/plans/<plan-name>.md
-```
-
-The verification checks:
-- Required sections are present (Overview, Requirements, Technical, Implementation, Success Criteria)
-- No unfilled placeholders ([TODO], [TBD], etc.)
-- Tasks are actionable with checkboxes
-- Risks are identified with mitigations
-- Success criteria are measurable
-
-If issues are found, offer to help fix them before marking the plan as ready.
 
 ## Reference
 
