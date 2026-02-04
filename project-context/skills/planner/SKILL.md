@@ -7,6 +7,14 @@ allowed-tools:
   - Write
   - Glob
   - Grep
+  - Bash
+hooks:
+  PostToolUse:
+    - matcher: "Write"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PROJECT_DIR}/project-context/skills/plan-verification/scripts/validate-plan-hook.sh"
+          statusMessage: "Validating plan..."
 ---
 
 # Feature & Project Planning Skill

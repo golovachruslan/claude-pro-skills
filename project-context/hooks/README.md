@@ -2,18 +2,25 @@
 
 Optional hooks for automating project context workflows.
 
+## Automatic Validation (Recommended)
+
+The `planner` skill has a built-in hook that automatically validates plans after saving.
+No additional setup required - validation runs automatically when using the `/project-context:plan` command.
+
+The hook is defined in the planner skill's frontmatter and triggers after any Write tool call.
+
 ## Available Hooks
 
-### validate-plan-hook.sh
+### validate-plan-hook.sh (Standalone)
 
-Automatically validates plan files when saved to `.project-context/plans/`.
+For use outside the planner workflow, you can manually configure this hook to validate plan files.
 
 **Triggers on:** `PostToolUse` (Write tool)
 **Filters:** Only runs for `.md` files in `.project-context/plans/`
 
-## Setup
+## Manual Setup (Optional)
 
-Add hook configuration to your Claude Code settings.
+If you want validation outside the planner workflow, add hook configuration to your Claude Code settings.
 
 ### Option 1: Project-level settings
 
