@@ -7,7 +7,6 @@ allowed-tools:
   - Write
   - Glob
   - Grep
-  - Bash
 hooks:
   PostToolUse:
     - matcher: "Write"
