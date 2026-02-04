@@ -76,3 +76,22 @@ If the user confirms:
 1. Create the `plans/` directory under `.project-context/` if it doesn't exist
 2. Save the plan with the selected filename in hyphen-case
 3. Update `.project-context/progress.md` to reference the new plan
+4. **Run plan verification** using the `plan-verification` skill
+
+## Plan Verification
+
+After saving the plan, automatically verify it using the `plan-verification` skill:
+
+1. Run the validation script:
+   ```bash
+   python project-context/skills/plan-verification/scripts/validate_plan.py .project-context/plans/<saved-plan>.md
+   ```
+
+2. Present verification results to the user
+
+3. If issues are found:
+   - Offer to help fix errors and warnings
+   - Re-run verification after fixes
+   - Confirm plan is ready for implementation
+
+This ensures all saved plans meet quality standards before implementation begins.
