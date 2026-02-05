@@ -18,13 +18,7 @@ hooks:
 
             If it's NOT a plan file, return {"ok": true}.
 
-            If it IS a plan file, read it and verify:
-            1. Has required sections: Overview, Requirements, Technical Approach, Implementation Phases, Success Criteria
-            2. No unfilled placeholders ([TODO], [TBD], etc.)
-            3. Implementation phases have concrete tasks with checkboxes
-            4. Has at least one risk identified (or states "no significant risks")
-            5. Success criteria are specific and measurable
-
+            If it IS a plan file, use the plan-verification skill to validate it.
             Return {"ok": true} if plan passes, or {"ok": false, "reason": "Issues found: ..."} if not.
           statusMessage: "Validating plan..."
           timeout: 60
