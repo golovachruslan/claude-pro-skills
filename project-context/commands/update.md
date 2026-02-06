@@ -1,7 +1,7 @@
 ---
 name: project-context:update
 description: Update project context files based on chat history, code changes, or user input
-argument-hint: "[file:brief|architecture|progress|patterns] [--chat|--scan|--input]"
+argument-hint: "[file:brief|architecture|state|progress|patterns] [--chat|--scan|--input]"
 allowed-tools:
   - Read
   - Write
@@ -19,16 +19,17 @@ Update one or more project context files based on different sources.
 ## Arguments
 
 - `file` (optional): Specific file to update
-  - `brief` - Project goals and scope
-  - `architecture` - System diagrams and flows
-  - `progress` - Current status and work items
-  - `patterns` - Patterns and learnings
+  - `brief` — Project goals and scope
+  - `architecture` — System diagrams and flows
+  - `state` — Current position and focus
+  - `progress` — Work status and items
+  - `patterns` — Patterns and learnings
   - If omitted: Smart update of relevant files
 
 - `--source` (optional): Where to get update information
-  - `--chat` - Extract from current conversation history
-  - `--scan` - Scan codebase for changes (git diff, new files)
-  - `--input` - Interactive input from user
+  - `--chat` — Extract from current conversation history
+  - `--scan` — Scan codebase for changes (git diff, new files)
+  - `--input` — Interactive input from user
   - Default: Smart detection (chat if recent discussion, else scan)
 
 ## Workflow
@@ -39,264 +40,66 @@ Update one or more project context files based on different sources.
 ls .project-context/*.md 2>/dev/null
 ```
 
-If not found, suggest: "Run `/project-context:init` first to create context structure."
+If not found: "Run `/project-context:init` first."
 
 ### Step 2: Determine Update Source
 
-Based on argument or smart detection:
-
-**Smart Detection Logic:**
-1. Check if there's meaningful conversation context → use chat
-2. Check git status for recent changes → use scan
+**Smart Detection:**
+1. Meaningful conversation context → use chat
+2. Git status shows changes → use scan
 3. Otherwise → prompt for input
 
 ### Step 3: Gather Update Information
 
-#### For --chat source:
-Analyze the current conversation for:
-- New decisions made
-- Problems solved
-- Architecture changes discussed
-- Progress updates mentioned
-- Patterns discovered
+#### For --chat:
+Analyze conversation for decisions, progress, patterns, architecture changes.
 
-Extract relevant information and categorize by file.
-
-#### For --scan source:
+#### For --scan:
 ```bash
-# Check recent git changes
 git diff --stat HEAD~5 2>/dev/null || git status --short
-
-# Find recently modified files
-find . -name "*.ts" -o -name "*.js" -o -name "*.py" -mtime -1 2>/dev/null | head -20
-
-# Check for new directories/components
-git status --short | grep "^A" | head -10
 ```
 
-Analyze changes for:
-- New components/modules → architecture.md
-- New patterns/approaches → patterns.md
-- Completed work → progress.md
+Analyze for new components → architecture.md, new patterns → patterns.md, completed work → progress.md.
 
-#### For --input source:
+#### For --input:
 Ask user specific questions based on the file being updated.
 
 ### Step 4: Update Files
 
-For each file being updated:
-
+For each file:
 1. Read current content
 2. Preserve existing content
-3. Append new information with timestamp
-4. Show diff of changes
+3. Add new information in appropriate section
+4. Update timestamp
 
-#### Updating brief.md
-- Add new goals or scope changes
-- Update success criteria if changed
+**File-specific guidance:**
 
-#### Updating architecture.md
-- **Add/update Mermaid diagrams** for new components or flows
-- Each diagram MUST have a step-by-step description below it
-- Update tech stack if new technologies added
-- Add key decisions with rationale
+| File | What to update |
+|------|----------------|
+| `brief.md` | Goals, scope changes |
+| `architecture.md` | New components, Mermaid diagrams (always with descriptions), tech decisions |
+| `state.md` | Current focus, active plan, blockers, next action, session info |
+| `progress.md` | Move items between Completed/In Progress/Upcoming |
+| `patterns.md` | New patterns, conventions, learnings |
 
-**Mermaid Diagram Format:**
-```markdown
-## [Flow/Component Name]
+### Step 5: Refresh Managed Sections
 
-```mermaid
-graph TD
-    A[Step 1] --> B[Step 2]
-    B --> C[Step 3]
-```
-
-**Flow Description:**
-1. **Step 1**: Description of what happens
-2. **Step 2**: Description of next step
-3. **Step 3**: Final step description
-```
-
-#### Updating progress.md
-- Move completed items from "In Progress" to "Completed"
-- Add new items to appropriate sections
-- Update current focus
-- Note any blockers
-
-#### Updating patterns.md
-- Add new patterns discovered
-- Document what worked/didn't work
-- Add key insights
-
-### Step 5: Refresh Managed Configuration Sections
-
-After updating context files, refresh managed sections in CLAUDE.md and AGENTS.md (if they exist).
-
-#### Refresh CLAUDE.md
-
-Check if CLAUDE.md exists and has managed section:
-```bash
-grep -q "<!-- PROJECT-CONTEXT:START -->" CLAUDE.md 2>/dev/null
-```
-
-If managed section exists, update the content between markers with latest instructions:
+Use the Python script for reliable updates:
 
 ```bash
-# Extract everything before managed section
-sed -n '1,/<!-- PROJECT-CONTEXT:START -->/p' CLAUDE.md | head -n -1 > /tmp/claude_before.md
-
-# Extract everything after managed section
-sed -n '/<!-- PROJECT-CONTEXT:END -->/,$p' CLAUDE.md | tail -n +2 > /tmp/claude_after.md
-
-# Combine with refreshed managed content
-cat /tmp/claude_before.md > CLAUDE.md
-cat << 'EOF' >> CLAUDE.md
-
-<!-- PROJECT-CONTEXT:START -->
-## Project Context
-
-These instructions are for AI assistants working in this project.
-
-Always read `.project-context/` files when starting work to understand:
-- Project goals and scope (`brief.md`)
-- System architecture and flows (`architecture.md`)
-- Current status and blockers (`progress.md`)
-- Established patterns and learnings (`patterns.md`)
-
-Use these files to:
-- Understand project constraints before making changes
-- Follow established patterns and conventions
-- Avoid duplicate work or conflicting approaches
-- Maintain consistency with project goals
-
-Keep this managed block so project-context commands can refresh the instructions.
-
-<!-- PROJECT-CONTEXT:END -->
-EOF
-cat /tmp/claude_after.md >> CLAUDE.md
-rm /tmp/claude_before.md /tmp/claude_after.md
+python project-context/scripts/manage_context.py update-sections --file CLAUDE.md
+python project-context/scripts/manage_context.py update-sections --file AGENTS.md
 ```
 
-#### Refresh AGENTS.md
+### Step 6: Show Summary
 
-Check if AGENTS.md exists and has managed section:
-```bash
-grep -q "<!-- PROJECT-CONTEXT:START -->" AGENTS.md 2>/dev/null
-```
-
-If managed section exists, update similarly:
-
-```bash
-# Extract everything before managed section
-sed -n '1,/<!-- PROJECT-CONTEXT:START -->/p' AGENTS.md | head -n -1 > /tmp/agents_before.md
-
-# Extract everything after managed section
-sed -n '/<!-- PROJECT-CONTEXT:END -->/,$p' AGENTS.md | tail -n +2 > /tmp/agents_after.md
-
-# Combine with refreshed managed content
-cat /tmp/agents_before.md > AGENTS.md
-cat << 'EOF' >> AGENTS.md
-
-<!-- PROJECT-CONTEXT:START -->
-## Project Context
-
-These instructions are for AI agents working in this project.
-
-Before executing tasks, read `.project-context/` files:
-- `brief.md` - Understand project scope and goals
-- `architecture.md` - Review system design and flows
-- `progress.md` - Check current status and blockers
-- `patterns.md` - Follow established patterns
-
-Use these files to:
-- Align work with project goals
-- Apply established architecture patterns
-- Avoid conflicts with current work
-- Make context-aware decisions
-
-Keep this managed block so project-context commands can refresh the instructions.
-
-<!-- PROJECT-CONTEXT:END -->
-EOF
-cat /tmp/agents_after.md >> AGENTS.md
-rm /tmp/agents_before.md /tmp/agents_after.md
-```
-
-### Step 6: Add Timestamp
-
-Each updated file should have its "Last updated" line modified:
-
-```markdown
----
-*Last updated: YYYY-MM-DD HH:MM*
-```
-
-### Step 7: Show Summary
-
-Display:
-- Context files updated
-- Configuration files refreshed (CLAUDE.md, AGENTS.md)
+- Files updated
 - Key changes made
-- Diff preview (truncated if large)
-
-## Examples
-
-### Update from chat
-```
-/project-context:update --chat
-```
-Extracts decisions, progress, and learnings from conversation.
-
-### Update architecture after adding new feature
-```
-/project-context:update architecture --scan
-```
-Scans code changes and updates architecture diagrams.
-
-### Update progress interactively
-```
-/project-context:update progress --input
-```
-Prompts for status updates.
-
-### Smart update all relevant files
-```
-/project-context:update
-```
-Detects best source and updates appropriate files.
+- Configuration files refreshed
 
 ## Architecture Update Guidelines
 
 When updating architecture.md:
-
 1. **Always use Mermaid diagrams** for visual representation
-2. **Common diagram types:**
-   - `graph TD` - Top-down flow
-   - `graph LR` - Left-right flow
-   - `sequenceDiagram` - API/interaction sequences
-   - `classDiagram` - Component relationships
-   - `flowchart` - Decision flows
-
-3. **Every diagram needs:**
-   - Clear title
-   - Descriptive node labels
-   - Step-by-step description below
-
-4. **Example patterns:**
-
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant A as API
-    participant D as Database
-    U->>A: Request
-    A->>D: Query
-    D-->>A: Result
-    A-->>U: Response
-```
-
-**API Flow:**
-1. User sends request to API endpoint
-2. API validates and queries database
-3. Database returns result
-4. API formats and sends response to user
+2. **Every diagram needs** a clear title, descriptive labels, and step-by-step description below
+3. Common types: `graph TD` (flow), `sequenceDiagram` (API calls), `classDiagram` (models)

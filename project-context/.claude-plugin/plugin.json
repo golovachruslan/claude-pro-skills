@@ -1,7 +1,7 @@
 {
   "name": "project-context",
-  "version": "1.5.0",
-  "description": "Maintain project context across sessions with structured documentation files. Similar to Cline Memory Bank - stores project goals, architecture diagrams, progress, and patterns. Includes intelligent planning with save confirmation, plan verification/validation, plan implementation, retrospective analysis, and adversarial challenge mode to stress-test decisions.",
+  "version": "2.0.0",
+  "description": "Maintain project context across sessions with structured files. 5-file model (brief, architecture, state, progress, patterns) with brainstorm-first workflow: discuss → plan → implement → retro. Includes smart routing, session continuity, multi-agent execution, quick mode for ad-hoc tasks, and adversarial challenge mode.",
   "author": {
     "name": "Ruslan Halavach",
     "email": "golovachruslan@gmail.com"
@@ -11,25 +11,19 @@
   "keywords": [
     "context",
     "memory",
-    "documentation",
-    "architecture",
-    "mermaid",
     "project-management",
-    "knowledge-base",
     "planning",
-    "plan-verification",
-    "plan-validation",
-    "requirements",
-    "feature-planning",
+    "brainstorming",
     "implementation",
+    "session-continuity",
+    "multi-agent",
+    "smart-routing",
     "retrospective",
-    "learnings",
-    "insights",
     "challenge",
-    "critique",
-    "stress-test",
-    "devil-advocate",
-    "review"
+    "quick-mode",
+    "state-management",
+    "executable-plans",
+    "deviation-rules"
   ],
   "commands": "./commands",
   "skills": "./skills"
