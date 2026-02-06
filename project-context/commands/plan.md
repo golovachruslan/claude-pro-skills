@@ -30,6 +30,11 @@ This command works best when combined with Claude Code's **native Plan Mode**:
 - **Codebase exploration**: Use `subagent_type=Explore` to understand existing code structure, find relevant files, and gather technical context
 - **Complex research**: Use `subagent_type=Plan` for designing implementation strategies when the feature is architecturally complex
 
+Example usage:
+```
+Task(subagent_type="Explore", prompt="Find all authentication-related files and understand the current auth patterns in use")
+```
+
 Using Task subagents allows parallel exploration of multiple codebase areas, reduces context usage, and provides more thorough analysis for planning.
 
 **If `Task` is not in your available tools**, proceed with direct Glob/Grep/Read operations as fallback.
