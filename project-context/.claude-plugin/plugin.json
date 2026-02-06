@@ -1,7 +1,7 @@
 {
   "name": "project-context",
-  "version": "2.0.0",
-  "description": "Maintain project context across sessions with structured files. 5-file model (brief, architecture, state, progress, patterns) with brainstorm-first workflow: discuss → plan → implement → retro. Includes smart routing, session continuity, multi-agent execution, quick mode for ad-hoc tasks, and adversarial challenge mode.",
+  "version": "2.1.0",
+  "description": "Maintain project context across sessions with structured files. 5-file model (brief, architecture, state, progress, patterns) with brainstorm-first workflow: discuss → plan → implement → retro. Leverages native Claude Code features: Agent Teams for parallel execution, Plan Mode for research-first planning, and persistent Tasks for cross-session tracking. Includes smart routing, session continuity, quick mode, and adversarial challenge mode.",
   "author": {
     "name": "Ruslan Halavach",
     "email": "golovachruslan@gmail.com"
@@ -17,6 +17,9 @@
     "implementation",
     "session-continuity",
     "multi-agent",
+    "agent-teams",
+    "plan-mode",
+    "native-tasks",
     "smart-routing",
     "retrospective",
     "challenge",

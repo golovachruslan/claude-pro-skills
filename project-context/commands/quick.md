@@ -78,6 +78,7 @@ Done! Here's what changed:
 **If `Task` is available**, use subagents for:
 - Parallel implementation of independent tasks
 - `subagent_type=Explore` for quick codebase reconnaissance
+- Run independent verification steps as background tasks (`run_in_background=true`)
 
 ## Rules
 

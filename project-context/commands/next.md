@@ -28,6 +28,8 @@ ls .project-context/*.md 2>/dev/null
 ls .project-context/plans/*.md 2>/dev/null
 ```
 
+Also check native Tasks (`Ctrl+T`) for pending/in-progress task items from previous sessions. Native Tasks persist on disk and may contain work items not yet reflected in context files.
+
 ### Step 2: Route Based on State
 
 Follow this routing logic in order:

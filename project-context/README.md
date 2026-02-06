@@ -4,13 +4,20 @@ Maintain project context across Claude Code sessions with structured documentati
 
 ## Features
 
-- **4 Structured Context Files** - Brief, Architecture, Progress, Patterns
+- **5 Structured Context Files** - Brief, Architecture, State, Progress, Patterns
+- **Brainstorm-First Workflow** - Discuss → Plan → Implement → Retro
+- **Native Claude Code Integration** (new in v2.1):
+  - **Agent Teams** — True parallel execution with inter-agent coordination for `/implement` and `/challenge`
+  - **Plan Mode** — Read-only research phase before planning via `/plan`
+  - **Persistent Tasks** — DAG-based task tracking that survives across sessions
 - **Intelligent Planning** - Feature/project planning with requirement gathering
-- **Retrospective Analysis** - Extract learnings from conversations and preserve insights (new in v1.2)
+- **Adversarial Challenge Mode** - Six Critics framework with optional Agent Teams for parallel analysis
+- **Retrospective Analysis** - Extract learnings from conversations and preserve insights
+- **Session Continuity** - Pause/resume with native Tasks state persistence
+- **Smart Routing** - `/next` command analyzes state and recommends actions
+- **Quick Mode** - Streamlined path for ad-hoc tasks
 - **Mermaid Diagrams** - Visual architecture and flow documentation
-- **Multiple Update Sources** - Chat history, code scanning, or manual input
 - **AI Agent Integration** - Auto-updates CLAUDE.md and AGENTS.md with managed sections
-- **OpenSpec-Aligned** - Uses HTML comment markers for managed configuration sections
 - **Validation** - Check completeness and freshness
 
 ## Installation
@@ -36,16 +43,41 @@ Maintain project context across Claude Code sessions with structured documentati
 /project-context:validate
 ```
 
+## Native Claude Code Features (v2.1)
+
+This plugin leverages three native Claude Code features for enhanced workflows:
+
+### Agent Teams (Swarm Mode)
+
+Enable in settings: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+
+- **`/project-context:implement`** — Team lead coordinates, teammates execute independent tasks in parallel with fresh context windows
+- **`/project-context:challenge --team`** — Each of the Six Critics runs as a separate teammate, enabling deeper analysis and inter-critic cross-referencing
+
+### Plan Mode
+
+- **`/project-context:plan`** — Enter Plan Mode (`Shift+Tab` x2) for read-only research before planning
+- **`opusplan` model** — Use `/model opusplan` for Opus-quality planning with Sonnet-speed execution
+
+### Persistent Tasks
+
+- Plans register tasks in Claude Code's native task system (`Ctrl+T` to view)
+- Tasks use DAG-based dependency tracking matching plan phases
+- Task state persists across sessions in `~/.claude/tasks/`
+- Set `CLAUDE_CODE_TASK_LIST_ID=project-name` for cross-session coordination
+- **`/project-context:pause`** exports task state; **`/project-context:resume`** restores it
+
 ## Context Files
 
-The plugin creates 4 files in `.project-context/`:
+The plugin creates 5 files in `.project-context/`:
 
 | File | Purpose | Update Frequency |
 |------|---------|------------------|
-| `brief.md` | Project goals, scope, requirements | Rarely |
-| `architecture.md` | Tech stack, Mermaid diagrams, system design | Often |
-| `progress.md` | Current status, completed/pending work | Frequently |
-| `patterns.md` | Established patterns and learnings | As needed |
+| `brief.md` | Project goals, scope, requirements | Rarely (on pivots) |
+| `architecture.md` | Tech stack, Mermaid diagrams, system design | On architecture changes |
+| `state.md` | Current position, blockers, next action | Every session |
+| `progress.md` | Completed/in-progress/upcoming work | Multiple times per week |
+| `patterns.md` | Established patterns and learnings | As patterns emerge |
 
 ## Commands
 
@@ -282,19 +314,26 @@ Keep this managed block so project-context commands can refresh the instructions
 .project-context/
 ├── brief.md        # Project goals and scope
 ├── architecture.md # System design with Mermaid diagrams
-├── progress.md     # Current status and work items
-└── patterns.md     # Established patterns and learnings
+├── state.md        # Current position, blockers, next action
+├── progress.md     # Completed/in-progress/upcoming work
+├── patterns.md     # Established patterns and learnings
+├── continue.md     # Session handoff (created by /pause)
+└── plans/          # Saved implementation plans
 ```
 
 ## Comparison with Cline Memory Bank
 
 | Feature | Cline Memory Bank | Project Context |
 |---------|-------------------|-----------------|
-| Files | 6 files | 4 files (simplified) |
+| Files | 6 files | 5 files (brief, architecture, state, progress, patterns) |
 | Diagrams | Text descriptions | Mermaid diagrams |
 | Updates | Manual | Multiple sources (chat, scan, input) |
 | Validation | None | Built-in validation |
 | AI Integration | Generic | CLAUDE.md/AGENTS.md specific |
+| Parallel execution | None | Agent Teams + Task subagents |
+| Planning workflow | None | Plan Mode + discuss → plan → implement |
+| Task persistence | None | Native Tasks with DAG dependencies |
+| Session continuity | None | pause/resume with task state export |
 
 ## License
 

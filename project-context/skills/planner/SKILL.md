@@ -34,6 +34,7 @@ Create structured, executable implementation plans. **Plans should flow from loc
 2. **Plans are executable prompts** — Every task must have: Files, Action, Verify, Done
 3. **Context-first** — Always read project context before planning
 4. **Decisions before details** — Check for locked decisions from /project-context:discuss
+5. **Leverage native features** — Use Plan Mode for research, native Tasks for tracking
 
 ## Planning Workflow
 
@@ -118,12 +119,23 @@ Use templates from `references/planning-templates.md`. Key structure:
 ```
 
 **Task rules:**
-- 2-4 tasks per phase (keeps context fresh if using subagents)
+- 2-4 tasks per phase (keeps context fresh if using subagents or Agent Teams)
 - Specify exact file paths
 - Verification must be executable (a command, URL check, or test)
 - "Done when" describes observable behavior, not code details
+- Mark task dependencies explicitly — these map to native Tasks DAG dependencies
 
-### 5. Save Plan
+### 5. Register in Native Tasks
+
+After creating the plan, **register tasks in Claude Code's native task system** (`Ctrl+T` to view):
+- Create task entries with proper dependency chains matching the plan phases
+- Set `CLAUDE_CODE_TASK_LIST_ID=plan-[feature-name]` for cross-session persistence
+- Tasks persist on disk — safe to `/clear` or `/compact` without losing the plan roadmap
+- When Agent Teams are used for implementation, teammates share the same task list
+
+**Fallback:** If native Tasks are not available, use TodoWrite for in-session tracking.
+
+### 6. Save Plan
 
 **Always ask the user** if they want to save:
 - Propose hyphen-case filename from feature name
