@@ -1,6 +1,6 @@
 ---
 name: project-context:init
-description: Initialize project context structure with 4 markdown files for tracking project state
+description: Initialize project context structure with 5 markdown files for tracking project state across sessions
 allowed-tools:
   - Read
   - Write
@@ -12,25 +12,22 @@ allowed-tools:
 
 # Initialize Project Context
 
-Create the `.project-context/` directory with 4 structured markdown files for maintaining project context across sessions.
+Create the `.project-context/` directory with 5 structured markdown files for maintaining project context across sessions.
 
 ## Workflow
 
 ### Step 1: Check Existing Context
 
-Check if `.project-context/` already exists:
-
 ```bash
 ls -la .project-context/ 2>/dev/null
 ```
 
-If exists, ask user:
-- "Project context already exists. Would you like to reinitialize (overwrites existing) or skip?"
+If exists, ask user: "Project context already exists. Reinitialize (overwrites) or skip?"
 
 ### Step 2: Create Directory Structure
 
 ```bash
-mkdir -p .project-context
+mkdir -p .project-context/plans
 ```
 
 ### Step 3: Gather Initial Context
@@ -43,7 +40,7 @@ Ask user for basic project information using AskUserQuestion:
 
 ### Step 4: Create Context Files
 
-Create 4 files with templates. Use the reference templates from the `project-context:project-context` skill.
+Create 5 files using templates from the project-context skill's `references/file-templates.md`.
 
 #### brief.md
 ```markdown
@@ -54,16 +51,12 @@ Create 4 files with templates. Use the reference templates from the `project-con
 
 ## Goals
 - [Primary goal]
-- [Secondary goals]
 
 ## Scope
 ### In Scope
 -
 
 ### Out of Scope
--
-
-## Success Criteria
 -
 
 ---
@@ -81,16 +74,12 @@ Create 4 files with templates. Use the reference templates from the `project-con
 
 ```mermaid
 graph TB
-    subgraph "System Architecture"
+    subgraph "System"
         A[Component A] --> B[Component B]
-        B --> C[Component C]
     end
 ```
 
-**Flow Description:**
-1. Step 1 description
-2. Step 2 description
-3. Step 3 description
+**Flow:** [Brief description]
 
 ## Key Decisions
 | Decision | Rationale | Date |
@@ -101,20 +90,38 @@ graph TB
 *Last updated: [current date]*
 ```
 
+#### state.md
+```markdown
+# State
+
+## Current Position
+**Phase:** Planning
+**Active Plan:** none
+**Focus:** [From user input]
+
+## Session Info
+**Last Session:** [current date]
+**Context:** Initial setup
+
+## Blockers
+- None
+
+## Decisions Pending
+- None
+
+## Next Action
+Run /project-context:discuss to brainstorm first feature
+
+---
+*Last updated: [current date]*
+```
+
 #### progress.md
 ```markdown
 # Progress
 
-## Current Focus
-[From user input]
-
-## Status
-- **Phase**: [Development/Testing/Production]
-- **Sprint/Cycle**:
-- **Blockers**: None
-
 ## Completed
-- [ ]
+- [x] Project context initialized ([current date])
 
 ## In Progress
 - [ ]
@@ -133,124 +140,36 @@ graph TB
 ```markdown
 # Patterns & Learnings
 
-## Established Patterns
-
-### Code Patterns
+## Code Patterns
 -
 
-### Architecture Patterns
--
-
-### Process Patterns
+## Naming Conventions
 -
 
 ## Learnings
-
-### What Worked
 -
 
-### What Didn't Work
--
-
-### Key Insights
+## Anti-Patterns
 -
 
 ---
 *Last updated: [current date]*
 ```
 
-### Step 5: Update AI Agent Configuration Files
+### Step 5: Update CLAUDE.md and AGENTS.md
 
-#### Update CLAUDE.md (if exists)
+Use the Python script for reliable managed section updates:
 
-Check if CLAUDE.md exists in project root:
 ```bash
-ls CLAUDE.md 2>/dev/null
+python project-context/scripts/manage_context.py update-sections --file CLAUDE.md
+python project-context/scripts/manage_context.py update-sections --file AGENTS.md
 ```
 
-If exists, check if managed section already present:
-```bash
-grep -q "<!-- PROJECT-CONTEXT:START -->" CLAUDE.md 2>/dev/null
-```
-
-If managed section does NOT exist, append the following:
-
-```markdown
-
-<!-- PROJECT-CONTEXT:START -->
-## Project Context
-
-These instructions are for AI assistants working in this project.
-
-Always read `.project-context/` files when starting work to understand:
-- Project goals and scope (`brief.md`)
-- System architecture and flows (`architecture.md`)
-- Current status and blockers (`progress.md`)
-- Established patterns and learnings (`patterns.md`)
-
-Use these files to:
-- Understand project constraints before making changes
-- Follow established patterns and conventions
-- Avoid duplicate work or conflicting approaches
-- Maintain consistency with project goals
-
-Keep this managed block so project-context commands can refresh the instructions.
-
-<!-- PROJECT-CONTEXT:END -->
-```
-
-If managed section ALREADY exists, inform user that CLAUDE.md already has project-context configuration.
-
-#### Update AGENTS.md (if exists)
-
-Check if AGENTS.md exists:
-```bash
-ls AGENTS.md 2>/dev/null
-```
-
-If exists, check if managed section already present:
-```bash
-grep -q "<!-- PROJECT-CONTEXT:START -->" AGENTS.md 2>/dev/null
-```
-
-If managed section does NOT exist, append the following:
-
-```markdown
-
-<!-- PROJECT-CONTEXT:START -->
-## Project Context
-
-These instructions are for AI agents working in this project.
-
-Before executing tasks, read `.project-context/` files:
-- `brief.md` - Understand project scope and goals
-- `architecture.md` - Review system design and flows
-- `progress.md` - Check current status and blockers
-- `patterns.md` - Follow established patterns
-
-Use these files to:
-- Align work with project goals
-- Apply established architecture patterns
-- Avoid conflicts with current work
-- Make context-aware decisions
-
-Keep this managed block so project-context commands can refresh the instructions.
-
-<!-- PROJECT-CONTEXT:END -->
-```
-
-If managed section ALREADY exists, inform user that AGENTS.md already has project-context configuration.
+If the script is not available, manually check for and add managed sections using HTML comment markers (`<!-- PROJECT-CONTEXT:START -->` / `<!-- PROJECT-CONTEXT:END -->`).
 
 ### Step 6: Confirmation
 
 Display summary:
-- List created files
+- List created files (5 files + plans directory)
 - Show any updates to CLAUDE.md/AGENTS.md
-- Suggest next steps: "Run `/project-context:update` to add more detail"
-
-## Tips
-
-- Keep brief.md stable - it's the foundation
-- Update architecture.md when adding new components or flows
-- Update progress.md frequently during active development
-- Add to patterns.md when you learn something valuable
+- Suggest next steps: "Run `/project-context:discuss` to brainstorm your first feature"

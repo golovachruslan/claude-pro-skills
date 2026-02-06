@@ -1,6 +1,6 @@
 ---
 name: project-context:implement
-description: Implement a feature plan step by step. Provide a plan file path or reference a plan from the conversation.
+description: Implement a plan using multi-agent execution with deviation rules. Provide a plan file path or reference a plan from the conversation.
 allowed-tools:
   - AskUserQuestion
   - Read
@@ -14,28 +14,16 @@ allowed-tools:
 
 # Implement Plan
 
-Execute an implementation plan step by step, tracking progress and asking for guidance when needed.
+Execute an implementation plan with multi-agent parallelism and automatic deviation handling.
 
 ## Task Tool Usage
 
-**Check if your available tools include `Task`.** If you have access to the Task tool, use Task subagents for:
+**If `Task` is available**, use Task subagents for:
+- **Parallel task execution**: Launch independent tasks within a phase simultaneously
+- **Fresh context per task**: Each subagent gets a clean context window
+- **Codebase exploration**: Use `subagent_type=Explore` before modifying unfamiliar code
 
-- **Codebase exploration**: Use `subagent_type=Explore` to understand existing patterns, find related code, and gather context before making changes
-- **Parallel implementation**: Launch multiple Task subagents for independent tasks within a phase to speed up implementation
-- **Complex sub-tasks**: Delegate multi-step sub-tasks to specialized agents
-
-Example usage:
-```
-Task(subagent_type="Explore", prompt="Find all places where user preferences are stored and understand the data flow")
-Task(subagent_type="Bash", prompt="Run the test suite and report any failures")
-```
-
-Benefits of using Task subagents:
-- Parallel execution of independent tasks
-- Reduced context usage for complex operations
-- Specialized agents for different task types (Explore, Bash, Plan)
-
-**If `Task` is not in your available tools**, proceed with direct tool operations (Glob, Grep, Read, Bash) as fallback.
+**If `Task` is not available**, execute tasks sequentially with direct tool operations.
 
 ## Usage
 
@@ -43,197 +31,122 @@ Benefits of using Task subagents:
 /project-context:implement [plan-path]
 ```
 
-**Arguments:**
-- `plan-path` (optional): Path to a plan file (e.g., `.project-context/plans/feature-name.md`)
-
 ## Workflow
 
 ### Step 1: Locate the Plan
 
-**If plan path is provided:**
-1. Read the specified plan file
-2. Validate it contains implementation phases/tasks
-3. Proceed to implementation
+**If path provided:** Read the specified plan file.
 
-**If no plan path provided:**
-1. Check if there's a plan in the current conversation
-2. Check for saved plans in `.project-context/plans/`:
-   ```bash
-   ls .project-context/plans/*.md 2>/dev/null
-   ```
-3. If plans found, ask user which one to implement
-4. If no plans found and no plan in conversation, inform user:
-   ```
-   No plan found. You can:
-   1. Run `/project-context:plan` to create a new plan
-   2. Provide a plan file path: `/project-context:implement path/to/plan.md`
-   ```
+**If no path:**
+1. Check conversation for a plan
+2. Check `.project-context/plans/` for saved plans
+3. If multiple plans, ask user which one
+4. If no plans found: "Run `/project-context:plan` first"
 
-### Step 2: Confirm Implementation
+### Step 2: Confirm Scope
 
-Before starting, use AskUserQuestion to confirm:
-
+Present the plan summary and ask:
 ```
-I found the following plan: [Plan Name]
-
-Phases:
-1. [Phase 1 name] - [X tasks]
-2. [Phase 2 name] - [X tasks]
-...
-
-Would you like me to implement this plan?
+Plan: [Name]
+Phases: [N] with [M] total tasks
 
 Options:
-1. Yes, implement all phases
-2. Yes, but only implement Phase [N]
-3. Yes, but let me pick specific tasks
-4. No, cancel
+1. Implement all phases
+2. Implement only Phase [N]
+3. Pick specific tasks
+4. Cancel
 ```
 
-**Do not proceed without user confirmation.**
+**Do not proceed without confirmation.**
 
 ### Step 3: Read Project Context
 
-Before implementing, read existing context to ensure consistency:
+Before implementing, read:
+- `.project-context/architecture.md` — Follow existing patterns
+- `.project-context/patterns.md` — Respect conventions
+- `.project-context/state.md` — Current position
 
-```bash
-ls .project-context/*.md 2>/dev/null
-```
+### Step 4: Execute Phase by Phase
 
-If context exists, read:
-- `.project-context/architecture.md` - Follow existing patterns
-- `.project-context/patterns.md` - Respect established conventions
-- `.project-context/progress.md` - Understand current state
+For each phase:
 
-### Step 4: Implement Phase by Phase
+1. **Announce the phase** with task list
+2. **Group tasks by dependencies**:
+   - Independent tasks within a phase → execute in parallel via Task subagents
+   - Dependent tasks → execute sequentially
+3. **For each task**, follow the executable format:
+   - Read the **Action** field for what to do
+   - Implement the change
+   - Run the **Verify** check
+   - Confirm against **Done when** criteria
+4. **Mark completed tasks** immediately
+5. **Handle deviations** using the rules below
 
-For each phase in the plan:
+### Step 5: Deviation Rules
 
-1. **Announce the phase:**
-   ```
-   Starting Phase [N]: [Phase Name]
-   Tasks in this phase:
-   - [ ] Task 1
-   - [ ] Task 2
-   ...
-   ```
+When encountering unexpected situations during execution:
 
-2. **Implement each task:**
-   - Follow the plan's technical approach
-   - Use existing patterns from project context
-   - Create/modify files as needed
-   - Run tests if applicable
+| Priority | Situation | Action |
+|----------|-----------|--------|
+| **Auto-fix** | Bugs (null pointers, inverted logic, security holes) | Fix immediately without asking |
+| **Auto-add** | Missing validation, error handling, auth checks | Add without asking |
+| **Auto-fix** | Blocking issues (missing imports, broken deps) | Fix without asking |
+| **ASK** | Architecture changes (new tables, schema changes, framework switches) | **STOP and ask user** |
+| **ASK** | Scope expansion (features not in the plan) | **STOP and ask user** |
+| **NEVER** | Skip tests, ignore patterns, change unrelated code | Never do this |
 
-3. **Mark completed tasks:**
-   ```
-   Completed: [Task description]
-   ```
+**Rule: ASK always supersedes Auto-fix/Auto-add.** When in doubt, ask.
 
-4. **Handle blockers:**
-   If you encounter an issue that blocks progress:
-   ```
-   Blocker encountered: [Description]
+### Step 6: Update State
 
-   Options:
-   1. Skip this task and continue
-   2. Try alternative approach: [suggestion]
-   3. Stop and discuss
-   ```
+After each phase:
+- Update `.project-context/state.md` with current position
+- Update `.project-context/progress.md` with completed items
+- Update plan file status (Planning → In Progress → Completed)
 
-5. **Phase completion:**
-   ```
-   Phase [N] complete!
-   - [X] tasks completed
-   - [Y] tasks skipped (if any)
-
-   Proceeding to Phase [N+1]...
-   ```
-
-### Step 5: Update Progress
-
-After completing implementation (or each phase):
-
-1. **Update `.project-context/progress.md`:**
-   - Move completed items to "Completed" section
-   - Update current focus
-   - Note any remaining work
-
-2. **Update plan file status** (if saved):
-   - Change status from "Planning" to "In Progress" or "Completed"
-   - Add completion notes
-
-3. **Update `.project-context/patterns.md`** if new patterns emerged
-
-### Step 6: Summary
-
-After implementation, provide a summary:
+### Step 7: Summary
 
 ```
 Implementation Complete!
 
-Phases completed: [X/Y]
-Tasks completed: [N]
-Tasks skipped: [M] (if any)
+Phases: [X/Y] completed
+Tasks: [N] completed, [M] skipped
 
 Files created:
-- path/to/file1.ts
-- path/to/file2.ts
+- path/to/new-file.ts
 
 Files modified:
-- path/to/existing1.ts
-- path/to/existing2.ts
+- path/to/existing.ts
 
 Next steps:
-1. [Suggested next action]
-2. [Testing recommendations]
+1. [Testing recommendations]
+2. [Consider running /project-context:retro to capture learnings]
 ```
+
+## Multi-Agent Execution Pattern
+
+When using Task subagents for parallel execution:
+
+```
+Phase 1 has 3 independent tasks:
+  Task 1 (auth middleware)    → Subagent A [fresh context]
+  Task 2 (login endpoint)    → Subagent B [fresh context]
+  Task 3 (auth tests)        → Subagent C [fresh context]
+
+Phase 2 depends on Phase 1:
+  Task 4 (depends on 1+2)    → Sequential after Phase 1
+  Task 5 (independent)       → Can parallel with Task 4
+```
+
+Each subagent receives:
+- The specific task (Action, Verify, Done criteria)
+- Relevant project context (architecture, patterns)
+- Locked decisions from the plan
 
 ## Best Practices
 
-### DO:
-- Confirm with user before starting
-- Announce each phase/task before starting
-- Follow existing project patterns and conventions
-- Update progress after each phase
-- Ask for guidance when encountering ambiguity
-- Run relevant tests after changes
-- Provide clear summary at the end
-
-### DON'T:
-- Start implementing without user confirmation
-- Skip reading project context
-- Ignore established patterns
-- Make major architectural decisions without asking
-- Continue past blockers without user input
-- Forget to update progress tracking
-
-## Examples
-
-### Example 1: Implement from saved plan file
-
-```
-User: /project-context:implement .project-context/plans/dark-mode.md
-Assistant: I found the Dark Mode plan. It has 3 phases with 12 total tasks.
-Would you like me to implement this plan?
-User: Yes, implement all phases
-Assistant: Starting Phase 1: Core Theme Setup...
-```
-
-### Example 2: Implement plan from conversation
-
-```
-User: /project-context:implement
-Assistant: I found a plan in our conversation for "User Authentication Feature".
-Would you like me to implement this plan?
-User: Yes
-Assistant: Starting implementation...
-```
-
-### Example 3: No plan found
-
-```
-User: /project-context:implement
-Assistant: No plan found. You can:
-1. Run /project-context:plan to create a new plan
-2. Provide a plan file path: /project-context:implement path/to/plan.md
-```
+- **Confirm before starting** — Never implement without user approval
+- **Follow existing patterns** — Read architecture.md and patterns.md
+- **Atomic progress** — Update state after each task, not just at the end
+- **Deviation rules** — Auto-fix bugs, ask about architecture changes
+- **Fresh context** — Use subagents for independent tasks to avoid context degradation

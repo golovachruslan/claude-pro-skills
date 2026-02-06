@@ -66,6 +66,7 @@ ls .project-context/*.md 2>/dev/null
 Read relevant files:
 - `.project-context/brief.md` - For scope/goal changes
 - `.project-context/architecture.md` - For architectural decisions/diagrams
+- `.project-context/state.md` - For current position and focus
 - `.project-context/patterns.md` - For patterns and learnings
 - `.project-context/progress.md` - For status updates
 
