@@ -16,13 +16,30 @@ allowed-tools:
 
 Execute an implementation plan with multi-agent parallelism and automatic deviation handling.
 
+## Usage
+
+```
+/project-context:implement [plan-path] [--solo] [--strategy teams|subagents|sequential]
+```
+
+**Execution flags:**
+- **`--solo`** — Skip Agent Teams, use subagents or sequential (shorthand for `--strategy subagents`)
+- **`--strategy teams`** — Force Agent Teams (fails if not enabled)
+- **`--strategy subagents`** — Force Task subagents (same as `--solo`)
+- **`--strategy sequential`** — Force sequential execution, no parallelism
+
+If no flag is provided, auto-selects the best available strategy.
+
 ## Execution Strategy Selection
 
-Choose the best execution strategy based on available capabilities:
+Resolve strategy from flags first, then auto-detect:
 
-### Strategy 1: Agent Teams (Preferred for large plans)
+1. **Parse flags** — `--solo` or `--strategy` override auto-detection
+2. **Auto-detect** (no flags) — Agent Teams > Task subagents > Sequential
 
-**When:** Plan has 3+ independent tasks across phases, and Agent Teams is enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in settings).
+### Strategy: Agent Teams (auto or `--strategy teams`)
+
+**When:** No `--solo`, plan has 3+ independent tasks, and Agent Teams is enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`).
 
 Agent Teams provide true parallel execution with separate context windows and inter-agent coordination:
 
@@ -50,26 +67,20 @@ Phase 2 — depends on Phase 1:
   Lead waits for Phase 1 completion → assigns Phase 2 tasks
 ```
 
-### Strategy 2: Task Subagents (Default)
+### Strategy: Task Subagents (`--solo` / `--strategy subagents` / default fallback)
 
-**When:** Agent Teams not available, or plan has fewer than 3 independent tasks.
+**When:** `--solo` specified, or Agent Teams not available/plan too small.
 
 Use Task tool subagents for parallel execution:
 - **Parallel task execution**: Launch independent tasks within a phase simultaneously
 - **Fresh context per task**: Each subagent gets a clean context window
 - **Codebase exploration**: Use `subagent_type=Explore` before modifying unfamiliar code
 
-### Strategy 3: Sequential Execution (Fallback)
+### Strategy: Sequential (`--strategy sequential` / final fallback)
 
-**When:** Neither Agent Teams nor Task tool is available.
+**When:** `--strategy sequential` specified, or neither Agent Teams nor Task tool is available.
 
 Execute tasks sequentially with direct tool operations.
-
-## Usage
-
-```
-/project-context:implement [plan-path]
-```
 
 ## Workflow
 
@@ -122,7 +133,7 @@ For each phase:
 
 1. **Announce the phase** with task list
 2. **Group tasks by dependencies**:
-   - Independent tasks within a phase → execute in parallel (Agent Teams or Task subagents)
+   - Independent tasks within a phase → execute in parallel (per selected strategy)
    - Dependent tasks → execute sequentially
 3. **For each task**, follow the executable format:
    - Read the **Action** field for what to do
@@ -185,3 +196,4 @@ Next steps:
 - **Deviation rules** — Auto-fix bugs, ask about architecture changes
 - **Fresh context** — Use Agent Teams or subagents for independent tasks to avoid context degradation
 - **Persistent tracking** — Use native Tasks so progress survives session interruptions
+- **Use `--solo` for small plans** — Agent Teams overhead isn't worth it for 1-2 tasks
