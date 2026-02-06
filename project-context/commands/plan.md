@@ -76,3 +76,5 @@ If the user confirms:
 1. Create the `plans/` directory under `.project-context/` if it doesn't exist
 2. Save the plan with the selected filename in hyphen-case
 3. Update `.project-context/progress.md` to reference the new plan
+
+Plan verification runs automatically after saving (via skill hook).

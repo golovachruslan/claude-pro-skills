@@ -7,6 +7,21 @@ allowed-tools:
   - Write
   - Glob
   - Grep
+hooks:
+  PostToolUse:
+    - matcher: "Write"
+      hooks:
+        - type: agent
+          prompt: |
+            Check if the file just written is a plan in .project-context/plans/.
+            Input: $ARGUMENTS
+
+            If it's NOT a plan file, return {"ok": true}.
+
+            If it IS a plan file, use the plan-verification skill to validate it.
+            Return {"ok": true} if plan passes, or {"ok": false, "reason": "Issues found: ..."} if not.
+          statusMessage: "Validating plan..."
+          timeout: 60
 ---
 
 # Feature & Project Planning Skill
@@ -570,6 +585,8 @@ What's the priority order? This will help me design the architecture and plan ph
 4. If user confirms, create plans directory and save plan
 5. Update `.project-context/progress.md` to reference the plan
 6. Update `.project-context/architecture.md` if architecture changes
+
+Plan verification runs automatically after saving (via skill hook).
 
 ### Plan File Structure
 ```markdown
