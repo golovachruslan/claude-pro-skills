@@ -188,6 +188,45 @@ Next steps:
 2. [Consider running /project-context:retro to capture learnings]
 ```
 
+## Multi-Agent Execution Patterns
+
+### Agent Teams Pattern
+
+```
+Phase 1 — 3 independent tasks:
+  Teammate A: auth middleware    [fresh context window]
+  Teammate B: login endpoint     [fresh context window]
+  Teammate C: auth tests         [fresh context window]
+
+Team lead: coordinates, resolves conflicts, handles deviations
+
+Phase 2 — depends on Phase 1:
+  Lead waits for Phase 1 → assigns Phase 2 teammates
+```
+
+Each teammate receives (via shared task list + project context):
+- The specific task (Action, Verify, Done criteria)
+- Relevant project context (architecture, patterns)
+- Locked decisions from the plan
+
+### Task Subagents Pattern (`--solo`)
+
+```
+Phase 1 has 3 independent tasks:
+  Task 1 (auth middleware)    → Subagent A [fresh context]
+  Task 2 (login endpoint)    → Subagent B [fresh context]
+  Task 3 (auth tests)        → Subagent C [fresh context]
+
+Phase 2 depends on Phase 1:
+  Task 4 (depends on 1+2)    → Sequential after Phase 1
+  Task 5 (independent)       → Can parallel with Task 4
+```
+
+Each subagent receives (via Task prompt):
+- The specific task (Action, Verify, Done criteria)
+- Relevant project context (architecture, patterns)
+- Locked decisions from the plan
+
 ## Best Practices
 
 - **Confirm before starting** — Never implement without user approval
