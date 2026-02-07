@@ -16,8 +16,10 @@ Maintain project context across Claude Code sessions with structured documentati
 - **Session Continuity** - Pause/resume with native Tasks state persistence
 - **Smart Routing** - `/next` command analyzes state and recommends actions
 - **Quick Mode** - Streamlined path for ad-hoc tasks
+- **Multiple Update Sources** - Chat history, code scanning, or manual input
 - **Mermaid Diagrams** - Visual architecture and flow documentation
 - **AI Agent Integration** - Auto-updates CLAUDE.md and AGENTS.md with managed sections
+- **OpenSpec-Aligned** - Uses HTML comment markers for managed configuration sections
 - **Validation** - Check completeness and freshness
 
 ## Installation
