@@ -12,6 +12,17 @@ allowed-tools:
 
 # Plan Feature or Project
 
+## Native Plan Mode Integration
+
+This command works best when combined with Claude Code's **native Plan Mode**:
+
+1. **Enter Plan Mode** (`Shift+Tab` twice) to enforce read-only research before planning
+2. Plan Mode restricts to research tools only (Read, Glob, Grep, Task) — no edits until the plan is approved
+3. After research, use `exit_plan_mode` to present the plan for approval
+4. Once approved, switch to execution mode to save the plan file
+
+**For complex plans**, consider using the `opusplan` model (`/model opusplan`) which automatically uses Opus for planning and Sonnet for execution.
+
 ## Task Tool Usage
 
 **Check if your available tools include `Task`.** If you have access to the Task tool, use Task subagents for:

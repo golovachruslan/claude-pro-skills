@@ -31,7 +31,17 @@ If `continue.md` does NOT exist:
 - Read `.project-context/progress.md` for current status
 - Inform user: "No handoff document found. Here's what I can see from project context..."
 
-### Step 2: Read Full Context
+### Step 2: Restore Native Tasks
+
+If `continue.md` references a Task List ID:
+- Set `CLAUDE_CODE_TASK_LIST_ID` to the referenced ID
+- Native Tasks persist in `~/.claude/tasks/` — the full task DAG with dependencies and status is automatically available
+- Press `Ctrl+T` to view the restored task list
+- Tasks that were "in progress" when paused should be re-examined
+
+If no Task List ID is referenced, check if native Tasks have pending items from a previous session.
+
+### Step 3: Read Full Context
 
 Read all context files to rebuild understanding:
 - `.project-context/brief.md` — project goals
@@ -45,7 +55,7 @@ If an active plan is referenced, read it too:
 ls .project-context/plans/*.md 2>/dev/null
 ```
 
-### Step 3: Present Status
+### Step 4: Present Status
 
 ```
 ## Resuming Session
@@ -63,11 +73,11 @@ ls .project-context/plans/*.md 2>/dev/null
 Shall I continue with step 1, or would you like to adjust the plan?
 ```
 
-### Step 4: Get Confirmation
+### Step 5: Get Confirmation
 
 Use AskUserQuestion to confirm the user wants to continue as planned, or if priorities have changed.
 
-### Step 5: Clean Up
+### Step 6: Clean Up
 
 After resuming, update state.md with current session info and remove or archive continue.md:
 - Update "Last Session" date

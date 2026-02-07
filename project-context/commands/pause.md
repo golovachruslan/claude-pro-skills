@@ -58,14 +58,32 @@ Write `.project-context/continue.md` with structured handoff:
 approaches tried and rejected, user preferences expressed, etc.]
 ```
 
-### Step 3: Update State File
+### Step 3: Export Native Tasks State
+
+If native Tasks are active (`Ctrl+T`), capture the current task list state in `continue.md`:
+- List all pending/in-progress tasks with their dependencies
+- Note the `CLAUDE_CODE_TASK_LIST_ID` if one was set
+- Tasks persist on disk in `~/.claude/tasks/` — the new session can resume from the same task list
+
+Add a "Task List" section to `continue.md`:
+```markdown
+## Task List State
+**Task List ID:** [ID if set, or "default"]
+**Pending tasks:** [count]
+**In progress:** [task names]
+**Blocked by:** [dependency info]
+
+To restore: Set `CLAUDE_CODE_TASK_LIST_ID=[ID]` in the new session.
+```
+
+### Step 4: Update State File
 
 Update `.project-context/state.md`:
 - Set "Focus" to note paused state
 - Set "Next Action" to "Resume from continue.md"
 - Update "Last Session" date
 
-### Step 4: Confirm
+### Step 5: Confirm
 
 ```
 Session state saved to .project-context/continue.md
@@ -74,4 +92,7 @@ To resume in a new session:
   /project-context:resume
 
 Or simply tell Claude: "Read .project-context/continue.md and pick up where we left off"
+
+Native Tasks persist automatically in ~/.claude/tasks/ — your task list
+will be available in the new session.
 ```
