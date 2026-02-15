@@ -5,14 +5,14 @@ Maintain project context across Claude Code sessions with structured documentati
 ## Features
 
 - **5 Structured Context Files** - Brief, Architecture, State, Progress, Patterns
-- **Brainstorm-First Workflow** - Discuss → Plan → Implement → Retro
+- **Brainstorm-First Workflow** - Discuss → Plan → Implement → Update
 - **Native Claude Code Integration** (new in v2.1):
   - **Agent Teams** — True parallel execution with inter-agent coordination for `/implement` and `/challenge`
   - **Plan Mode** — Read-only research phase before planning via `/plan`
   - **Persistent Tasks** — DAG-based task tracking that survives across sessions
 - **Intelligent Planning** - Feature/project planning with requirement gathering
 - **Adversarial Challenge Mode** - Six Critics framework with optional Agent Teams for parallel analysis
-- **Retrospective Analysis** - Extract learnings from conversations and preserve insights
+- **Deep Context Updates** - Extract learnings from conversations, scan codebase, or interactive input
 - **Session Continuity** - Pause/resume with native Tasks state persistence
 - **Smart Routing** - `/next` command analyzes state and recommends actions
 - **Quick Mode** - Streamlined path for ad-hoc tasks
@@ -83,51 +83,6 @@ The plugin creates 5 files in `.project-context/`:
 
 ## Commands
 
-### `/project-context:retro`
-
-**NEW in v1.2** - Retrospective analysis to extract and preserve key learnings:
-
-```bash
-# Analyze conversation and capture learnings
-/project-context:retro
-```
-
-The retro skill will:
-1. **Analyze conversation** - Review session for learnings, decisions, patterns, errors
-2. **Extract insights** - Identify valuable knowledge to preserve
-3. **Categorize learnings** - Map insights to appropriate context files
-4. **Propose updates** - Show exactly what will be added and where
-5. **Ask confirmation** - Get user approval before applying changes
-6. **Apply updates** - Add approved content to the right files
-
-The retro excels at capturing:
-- **Key learnings** - What worked, what didn't, new discoveries
-- **Technical decisions** - Architecture choices, library selections, trade-offs
-- **Patterns** - Coding patterns, best practices, anti-patterns to avoid
-- **Solutions** - Bug fixes, debugging insights, error handling approaches
-- **Progress** - Completed features, current work, next steps
-
-**Example retro session:**
-```
-User: /project-context:retro
-
-Claude: I've analyzed our dark mode implementation session. Here are the key learnings:
-
-## Proposed Updates
-
-### 1. patterns.md - Theme Management
-**Insight:** Established pattern for theme switching with Context API
-**Proposed Addition:**
-[Shows exact content to be added]
-
-### 2. progress.md - Recent Completions
-**Insight:** Dark mode feature is complete
-**Proposed Addition:**
-[Shows completion entry]
-
-Do these updates look good? Should I modify anything before applying?
-```
-
 ### `/project-context:plan`
 
 **NEW in v1.1** - Intelligent feature and project planning with systematic requirement gathering:
@@ -181,10 +136,10 @@ Initialize project context structure:
 
 ### `/project-context:update [file] [--source]`
 
-Update context files from various sources:
+Update context files from various sources. The `--chat` mode includes deep conversation analysis with signal recognition, quality filters, and structured proposals with user confirmation.
 
 ```bash
-# Update from conversation
+# Deep conversation analysis (captures learnings, decisions, patterns)
 /project-context:update --chat
 
 # Update from code changes
@@ -197,10 +152,10 @@ Update context files from various sources:
 /project-context:update
 ```
 
-**Files:** `brief`, `architecture`, `progress`, `patterns`
+**Files:** `brief`, `architecture`, `state`, `progress`, `patterns`
 
 **Sources:**
-- `--chat` - Extract from current conversation
+- `--chat` - Deep analysis of current conversation (signal recognition, quality filters, proposals with rationale)
 - `--scan` - Scan codebase for changes (git diff)
 - `--input` - Interactive input
 

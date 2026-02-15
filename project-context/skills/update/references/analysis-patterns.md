@@ -1,4 +1,4 @@
-# Retrospective Analysis Patterns
+# Analysis Patterns
 
 Patterns for extracting learnings from conversations, organized by conversation type.
 

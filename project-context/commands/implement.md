@@ -185,7 +185,7 @@ Files modified:
 
 Next steps:
 1. [Testing recommendations]
-2. [Consider running /project-context:retro to capture learnings]
+2. [Consider running /project-context:update --chat to capture learnings]
 ```
 
 ## Multi-Agent Execution Patterns
