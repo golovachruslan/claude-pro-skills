@@ -59,7 +59,7 @@ project-context uses HTML comment markers to delimit managed sections:
 
 | Aspect | Guideline |
 |--------|-----------|
-| **Upstream/Downstream** | Declare both directions; the validator checks reciprocity |
+| **Upstream/Downstream** | Declare both directions; `/add-dependency` offers reciprocal updates |
 | **Paths** | Use relative paths from the project root (`../shared`, `../api`) |
 | **Integration Points** | List key files at boundaries, not every import |
 | **Impact Rules** | Focus on breaking-change scenarios only |
@@ -67,11 +67,7 @@ project-context uses HTML comment markers to delimit managed sections:
 
 ### Reciprocal Declarations
 
-If `api` lists `shared` as upstream, then `shared` should list `api` as downstream. Run `deps-validate` to catch mismatches:
-
-```bash
-python manage_context.py deps-validate --root .
-```
+If `api` lists `shared` as upstream, then `shared` should list `api` as downstream. The `/project-context:add-dependency` command handles this automatically by offering to update both sides.
 
 ### Context Resolution in Monorepos
 

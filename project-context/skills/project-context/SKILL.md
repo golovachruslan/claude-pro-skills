@@ -70,17 +70,18 @@ For monorepos with multiple subprojects, each subproject can have its own `.proj
 2. When touching integration boundaries, check `dependencies.md` for upstream/downstream
 3. On-demand: read a dependency's `brief.md` + `architecture.md` for cross-project context
 
-### Dependency Commands
+### Adding Dependencies
+
+Use `/project-context:add-dependency` to interactively declare a relationship. It handles:
+- Discovering sibling projects
+- Creating or updating `dependencies.md`
+- Offering reciprocal updates to the target project
+
+### Viewing Dependencies
 
 ```bash
-# Show deps for current project
+# Show parsed deps for current project
 python manage_context.py deps --dir .
-
-# Discover all contexts and build full graph
-python manage_context.py deps --root /path/to/monorepo
-
-# Validate reciprocal declarations, paths, cycles
-python manage_context.py deps-validate --root /path/to/monorepo
 ```
 
 ## Reference

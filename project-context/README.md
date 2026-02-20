@@ -223,28 +223,25 @@ When changing this project, consider:
 - **Breaking API changes** → Notify: web
 ```
 
-### Dependency Commands
+### Adding Dependencies
 
 ```bash
-# Show dependencies for current project
-python manage_context.py deps --dir packages/api
-
-# Build full monorepo dependency graph (discovers all .project-context/ dirs)
-python manage_context.py deps --root .
-
-# Validate: path resolution, reciprocal declarations, circular dependency detection
-python manage_context.py deps-validate --root .
+# Interactive — discovers siblings, prompts for direction/target, updates both sides
+/project-context:add-dependency
 ```
 
-The `deps --root` command also generates a **Mermaid diagram** of the full dependency graph.
+The command handles:
+- Discovering sibling projects with `.project-context/`
+- Prompting for direction (upstream/downstream), target, and what's shared
+- Creating `dependencies.md` if it doesn't exist
+- Offering reciprocal updates to the target project
 
-### Validation Checks
+### Viewing Dependencies
 
-`deps-validate` catches:
-- **Broken paths** — dependency path doesn't resolve to a directory
-- **Missing reciprocals** — api lists shared as upstream, but shared doesn't list api as downstream
-- **Circular dependencies** — A → B → C → A cycles
-- **Missing contexts** — dependency target has no `.project-context/`
+```bash
+# Show parsed dependencies for current project
+python manage_context.py deps --dir packages/api
+```
 
 ### Context Resolution Rules
 
