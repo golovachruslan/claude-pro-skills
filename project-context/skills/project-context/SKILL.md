@@ -7,7 +7,7 @@ description: "Use this skill when users ask about project context, project goals
 
 Provide informed responses about project state by reading structured context files from `.project-context/`.
 
-## Context Files (5-file model)
+## Context Files (5+1 file model)
 
 | File | Purpose | Update Frequency |
 |------|---------|-----------------|
@@ -16,6 +16,7 @@ Provide informed responses about project state by reading structured context fil
 | `state.md` | Current position, blockers, next action | Every session |
 | `progress.md` | Completed/in-progress/upcoming work | Multiple times per week |
 | `patterns.md` | Established patterns and learnings | As patterns emerge |
+| `dependencies.md` | Cross-project dependencies (monorepo, optional) | On dependency changes |
 
 ## Workflow
 
@@ -37,6 +38,8 @@ If not found: "No project context found. Run `/project-context:init` to set up."
 | "Architecture/how it works" | architecture.md | patterns.md |
 | "Tech stack" | architecture.md | - |
 | "What patterns do we use?" | patterns.md | architecture.md |
+| "What depends on this?" | dependencies.md | architecture.md |
+| "Cross-project impact?" | dependencies.md | state.md |
 | General context | All files | - |
 
 ### 3. Synthesize Response
@@ -57,7 +60,30 @@ If not found: "No project context found. Run `/project-context:init` to set up."
 If context seems stale (state.md >1 day, progress.md >3 days during active dev):
 - Suggest: "Context may be outdated. Run `/project-context:update --scan` to refresh."
 
+## Monorepo Support
+
+For monorepos with multiple subprojects, each subproject can have its own `.project-context/` with an optional `dependencies.md` declaring cross-project relationships.
+
+### Context Resolution (Federated Model)
+
+1. Always load local `.project-context/`
+2. When touching integration boundaries, check `dependencies.md` for upstream/downstream
+3. On-demand: read a dependency's `brief.md` + `architecture.md` for cross-project context
+
+### Dependency Commands
+
+```bash
+# Show deps for current project
+python manage_context.py deps --dir .
+
+# Discover all contexts and build full graph
+python manage_context.py deps --root /path/to/monorepo
+
+# Validate reciprocal declarations, paths, cycles
+python manage_context.py deps-validate --root /path/to/monorepo
+```
+
 ## Reference
 
-- `references/file-templates.md` — Template structures for each file
+- `references/file-templates.md` — Template structures for each file (including dependencies.md)
 - `references/best-practices.md` — Guidelines for maintaining context

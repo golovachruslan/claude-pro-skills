@@ -71,7 +71,7 @@ Enable in settings: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
 
 ## Context Files
 
-The plugin creates 5 files in `.project-context/`:
+The plugin creates 5+1 files in `.project-context/`:
 
 | File | Purpose | Update Frequency |
 |------|---------|------------------|
@@ -80,6 +80,7 @@ The plugin creates 5 files in `.project-context/`:
 | `state.md` | Current position, blockers, next action | Every session |
 | `progress.md` | Completed/in-progress/upcoming work | Multiple times per week |
 | `patterns.md` | Established patterns and learnings | As patterns emerge |
+| `dependencies.md` | Cross-project dependencies (optional, monorepo) | On dependency changes |
 
 ## Commands
 
@@ -167,6 +168,91 @@ Check context files for:
 - Mermaid syntax errors
 - Stale content (outdated timestamps)
 - References to non-existent files
+
+## Monorepo Support
+
+For monorepos with multiple subprojects, each subproject maintains its own `.project-context/` directory. The optional `dependencies.md` file declares cross-project relationships using a **federated dependency graph** model.
+
+### Structure
+
+```
+monorepo/
+├── .project-context/              # Root: system-wide architecture
+│   ├── brief.md
+│   ├── architecture.md            # Inter-service flows
+│   └── patterns.md                # Shared conventions
+├── packages/api/.project-context/ # API subproject
+│   ├── brief.md
+│   ├── architecture.md
+│   ├── state.md
+│   ├── progress.md
+│   ├── patterns.md
+│   └── dependencies.md            # Declares: consumes shared, consumed by web
+├── packages/web/.project-context/ # Web subproject
+│   └── ...
+└── packages/shared/.project-context/
+    └── ...
+```
+
+### dependencies.md Format
+
+Each subproject declares its upstream (consumes) and downstream (consumed by) relationships:
+
+```markdown
+# Dependencies
+
+## Upstream (Consumes)
+
+| Project | Path | What | Notes |
+|---------|------|------|-------|
+| shared | ../shared | Types, validation utilities | Core domain types |
+
+## Downstream (Consumed By)
+
+| Project | Path | What | Notes |
+|---------|------|------|-------|
+| web | ../web | REST API endpoints | v2 API |
+
+## Integration Points
+
+Key files/interfaces at dependency boundaries.
+
+## Impact Rules
+
+When changing this project, consider:
+- **Breaking API changes** → Notify: web
+```
+
+### Dependency Commands
+
+```bash
+# Show dependencies for current project
+python manage_context.py deps --dir packages/api
+
+# Build full monorepo dependency graph (discovers all .project-context/ dirs)
+python manage_context.py deps --root .
+
+# Validate: path resolution, reciprocal declarations, circular dependency detection
+python manage_context.py deps-validate --root .
+```
+
+The `deps --root` command also generates a **Mermaid diagram** of the full dependency graph.
+
+### Validation Checks
+
+`deps-validate` catches:
+- **Broken paths** — dependency path doesn't resolve to a directory
+- **Missing reciprocals** — api lists shared as upstream, but shared doesn't list api as downstream
+- **Circular dependencies** — A → B → C → A cycles
+- **Missing contexts** — dependency target has no `.project-context/`
+
+### Context Resolution Rules
+
+When working in a subproject:
+1. Read that subproject's `.project-context/` first
+2. Check `dependencies.md` for upstream/downstream relationships
+3. When touching integration boundaries, pull in the dependency's `brief.md` + `architecture.md`
+4. Never load a dependency's `state.md` or `progress.md` — that's their internal concern
 
 ## Architecture Documentation
 
@@ -269,20 +355,21 @@ Keep this managed block so project-context commands can refresh the instructions
 
 ```
 .project-context/
-├── brief.md        # Project goals and scope
-├── architecture.md # System design with Mermaid diagrams
-├── state.md        # Current position, blockers, next action
-├── progress.md     # Completed/in-progress/upcoming work
-├── patterns.md     # Established patterns and learnings
-├── continue.md     # Session handoff (created by /pause)
-└── plans/          # Saved implementation plans
+├── brief.md           # Project goals and scope
+├── architecture.md    # System design with Mermaid diagrams
+├── state.md           # Current position, blockers, next action
+├── progress.md        # Completed/in-progress/upcoming work
+├── patterns.md        # Established patterns and learnings
+├── dependencies.md    # Cross-project dependencies (optional, monorepo)
+├── continue.md        # Session handoff (created by /pause)
+└── plans/             # Saved implementation plans
 ```
 
 ## Comparison with Cline Memory Bank
 
 | Feature | Cline Memory Bank | Project Context |
 |---------|-------------------|-----------------|
-| Files | 6 files | 5 files (brief, architecture, state, progress, patterns) |
+| Files | 6 files | 5+1 files (brief, architecture, state, progress, patterns + dependencies) |
 | Diagrams | Text descriptions | Mermaid diagrams |
 | Updates | Manual | Multiple sources (chat, scan, input) |
 | Validation | None | Built-in validation |
@@ -291,6 +378,7 @@ Keep this managed block so project-context commands can refresh the instructions
 | Planning workflow | None | Plan Mode + discuss → plan → implement |
 | Task persistence | None | Native Tasks with DAG dependencies |
 | Session continuity | None | pause/resume with task state export |
+| Monorepo support | None | Federated dependency graph with validation |
 
 ## License
 
