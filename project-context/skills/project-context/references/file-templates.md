@@ -162,3 +162,44 @@ graph TB
 ---
 *Last updated: YYYY-MM-DD*
 ```
+
+## dependencies.json
+
+For monorepo subprojects that need to declare relationships with sibling projects.
+This file is optional — only needed when a project has cross-project dependencies.
+
+```json
+{
+  "upstream": [
+    {
+      "project": "shared",
+      "path": "../shared",
+      "what": "Types, validation utilities",
+      "note": "Core domain types"
+    },
+    {
+      "project": "database",
+      "path": "../database",
+      "what": "Schema definitions",
+      "note": "Read-only access"
+    }
+  ],
+  "downstream": [
+    {
+      "project": "web",
+      "path": "../web",
+      "what": "REST API endpoints",
+      "note": "v2 API"
+    }
+  ]
+}
+```
+
+**Fields per entry:**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `project` | Yes | Name of the dependency |
+| `path` | Yes | Relative path from this project (e.g., `../shared`) |
+| `what` | Yes | What is shared (types, API, utilities, etc.) |
+| `note` | No | Additional context (can be empty string) |

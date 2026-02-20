@@ -7,18 +7,18 @@ Usage:
     python manage_context.py status [--dir DIR]
     python manage_context.py validate [--dir DIR]
     python manage_context.py update-sections [--file FILE]
+    python manage_context.py deps [--dir DIR]
 """
 
 import argparse
 import json
-import os
 import re
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
 
-CONTEXT_FILES = ["brief.md", "architecture.md", "state.md", "progress.md", "patterns.md"]
+CONTEXT_FILES = ["brief.md", "architecture.md", "state.md", "progress.md", "patterns.md", "dependencies.json"]
 
 STALENESS_DAYS = {
     "brief.md": 30,
@@ -26,6 +26,7 @@ STALENESS_DAYS = {
     "state.md": 1,
     "progress.md": 3,
     "patterns.md": 14,
+    "dependencies.json": 30,
 }
 
 MANAGED_SECTION_START = "<!-- PROJECT-CONTEXT:START -->"
@@ -41,6 +42,7 @@ Always read `.project-context/` files when starting work:
 - `state.md` — Current position, blockers, next action
 - `progress.md` — Completed/in-progress/upcoming work
 - `patterns.md` — Established patterns and learnings
+- `dependencies.json` — Cross-project dependencies (monorepo)
 
 <!-- PROJECT-CONTEXT:END -->
 """
@@ -55,6 +57,7 @@ Before executing tasks, read `.project-context/` files:
 - `state.md` — Current position and blockers
 - `progress.md` — Work status
 - `patterns.md` — Established patterns
+- `dependencies.json` — Cross-project dependencies (monorepo)
 
 <!-- PROJECT-CONTEXT:END -->
 """
@@ -66,6 +69,27 @@ def find_context_dir(start_dir="."):
     if context_dir.is_dir():
         return context_dir
     return None
+
+
+def parse_dependencies(context_dir):
+    """Parse dependencies.json and return structured dependency data.
+
+    Returns dict with upstream, downstream lists, or None if file missing.
+    """
+    deps_file = context_dir / "dependencies.json"
+    if not deps_file.exists():
+        return None
+
+    try:
+        data = json.loads(deps_file.read_text())
+    except (json.JSONDecodeError, ValueError):
+        return None
+
+    # Ensure expected keys exist with defaults
+    return {
+        "upstream": data.get("upstream", []),
+        "downstream": data.get("downstream", []),
+    }
 
 
 def cmd_status(args):
@@ -110,6 +134,9 @@ def cmd_status(args):
     if plans_dir.is_dir():
         plans = [f.name for f in plans_dir.glob("*.md")]
 
+    # Parse dependencies if present
+    deps = parse_dependencies(context_dir)
+
     # Determine suggested next action
     next_action = _determine_next_action(files, plans, context_dir)
 
@@ -120,6 +147,14 @@ def cmd_status(args):
         "plans": plans,
         "next_action": next_action,
     }
+
+    if deps:
+        result["dependencies"] = {
+            "upstream_count": len(deps["upstream"]),
+            "downstream_count": len(deps["downstream"]),
+            "upstream": [d["project"] for d in deps["upstream"]],
+            "downstream": [d["project"] for d in deps["downstream"]],
+        }
 
     print(json.dumps(result, indent=2))
     return 0
@@ -172,6 +207,9 @@ def cmd_validate(args):
     for fname in CONTEXT_FILES:
         fpath = context_dir / fname
         if not fpath.exists():
+            # dependencies.md is optional
+            if fname == "dependencies.json":
+                continue
             if fname == "state.md":
                 issues.append({"file": fname, "severity": "warning", "message": "state.md missing — add for session continuity"})
             elif fname in ("brief.md", "architecture.md"):
@@ -179,6 +217,18 @@ def cmd_validate(args):
             continue
 
         content = fpath.read_text()
+
+        # JSON file validation (dependencies.json)
+        if fname.endswith(".json"):
+            try:
+                data = json.loads(content)
+                if not data.get("upstream") and not data.get("downstream"):
+                    issues.append({"file": fname, "severity": "warning", "message": f"{fname} has no upstream or downstream dependencies"})
+            except (json.JSONDecodeError, ValueError) as e:
+                issues.append({"file": fname, "severity": "error", "message": f"{fname} is invalid JSON: {e}"})
+            continue
+
+        # Markdown file validation
         lines = content.splitlines()
 
         # Check if file is essentially empty (only template markers)
@@ -205,6 +255,29 @@ def cmd_validate(args):
         if fname == "architecture.md":
             if "```mermaid" not in content:
                 issues.append({"file": fname, "severity": "warning", "message": "architecture.md has no Mermaid diagrams"})
+
+    # Validate dependencies.md paths if present
+    deps = parse_dependencies(context_dir)
+    if deps:
+        project_root = Path(args.dir).resolve()
+        all_deps = deps["upstream"] + deps["downstream"]
+        for dep in all_deps:
+            dep_path = (context_dir.parent / dep["path"]).resolve()
+            if not dep_path.is_dir():
+                issues.append({
+                    "file": "dependencies.json",
+                    "severity": "warning",
+                    "message": f"Dependency '{dep['project']}' path not found: {dep['path']}"
+                })
+            else:
+                # Check if the dependency target also has a .project-context/
+                dep_context = dep_path / ".project-context"
+                if not dep_context.is_dir():
+                    issues.append({
+                        "file": "dependencies.json",
+                        "severity": "info",
+                        "message": f"Dependency '{dep['project']}' at {dep['path']} has no .project-context/ — consider initializing it"
+                    })
 
     # Check plans directory
     plans_dir = context_dir / "plans"
@@ -251,6 +324,43 @@ def cmd_update_sections(args):
     return 0
 
 
+def cmd_deps(args):
+    """Show parsed dependencies for a single project."""
+    context_dir = find_context_dir(args.dir)
+    if not context_dir:
+        print(json.dumps({
+            "error": "No .project-context/ directory found.",
+            "hint": "Run /project-context:init first, then /project-context:add-dependency"
+        }))
+        return 1
+
+    deps = parse_dependencies(context_dir)
+    if not deps:
+        print(json.dumps({
+            "has_dependencies": False,
+            "message": "No dependencies.json found.",
+            "hint": "Run /project-context:add-dependency to declare cross-project relationships"
+        }))
+        return 0
+
+    # Resolve paths and check if dependency contexts exist
+    for dep_list_key in ("upstream", "downstream"):
+        for dep in deps[dep_list_key]:
+            dep_abs = (context_dir.parent / dep["path"]).resolve()
+            dep["resolved_path"] = str(dep_abs)
+            dep["exists"] = dep_abs.is_dir()
+            dep["has_context"] = (dep_abs / ".project-context").is_dir()
+
+    result = {
+        "project_dir": str(Path(args.dir).resolve()),
+        "has_dependencies": True,
+        **deps,
+    }
+
+    print(json.dumps(result, indent=2))
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(description="Project context management")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -267,12 +377,17 @@ def main():
     sections_parser = subparsers.add_parser("update-sections", help="Update managed sections in CLAUDE.md/AGENTS.md")
     sections_parser.add_argument("--file", required=True, help="Path to CLAUDE.md or AGENTS.md")
 
+    # deps command
+    deps_parser = subparsers.add_parser("deps", help="Show parsed dependencies for current project")
+    deps_parser.add_argument("--dir", default=".", help="Project directory")
+
     args = parser.parse_args()
 
     commands = {
         "status": cmd_status,
         "validate": cmd_validate,
         "update-sections": cmd_update_sections,
+        "deps": cmd_deps,
     }
 
     return commands[args.command](args)
