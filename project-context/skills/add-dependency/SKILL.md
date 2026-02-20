@@ -12,7 +12,7 @@ allowed-tools:
 
 # Add Cross-Project Dependency
 
-Add a dependency relationship between subprojects in a monorepo. Creates `dependencies.md` if needed, appends to it if it exists, and optionally updates the other side (reciprocal declaration).
+Add a dependency relationship between subprojects in a monorepo. Creates `dependencies.json` if needed, appends to it if it exists, and optionally updates the other side (reciprocal declaration).
 
 ## Parameter
 
@@ -28,7 +28,7 @@ Only one optional parameter: the relative path to the target project.
 ### 1. Detect Current Subproject
 
 ```bash
-ls .project-context/*.md 2>/dev/null
+ls .project-context/*.md .project-context/*.json 2>/dev/null
 ```
 
 If no `.project-context/` exists:
@@ -85,60 +85,45 @@ Options:
 - **No notes**
 - **Custom** (user types)
 
-### 7. Create or Update dependencies.md
+### 7. Create or Update dependencies.json
 
-#### If dependencies.md doesn't exist — create it:
+#### If dependencies.json doesn't exist — create it:
 
-```markdown
-# Dependencies
-
-## Upstream (Consumes)
-
-Projects this subproject depends on.
-
-| Project | Path | What | Notes |
-|---------|------|------|-------|
-
-## Downstream (Consumed By)
-
-Projects that depend on this subproject.
-
-| Project | Path | What | Notes |
-|---------|------|------|-------|
-
-## Integration Points
-
-Key files/interfaces at dependency boundaries.
-
-## Impact Rules
-
-When changing this project, consider:
-
----
-*Last updated: [current date]*
+```json
+{
+  "upstream": [],
+  "downstream": []
+}
 ```
 
-Then insert the new row into the correct section (Upstream or Downstream).
+Then add the new entry to the correct array.
 
-#### If dependencies.md exists — append row:
+#### If dependencies.json exists — read, append, write:
 
-Read the file. Find the last data row in the target section's table. Insert after it using the Edit tool. Do NOT overwrite existing entries.
+1. Read and parse the existing JSON
+2. Append the new entry to the correct array (`upstream` or `downstream`)
+3. Write back with `indent=2`
 
-**Row format:**
+**Entry format:**
+```json
+{
+  "project": "[target-name]",
+  "path": "[relative-path]",
+  "what": "[what-shared]",
+  "note": "[note or empty string]"
+}
 ```
-| [target-name] | [relative-path] | [what] | [note] |
-```
 
-Update the `*Last updated:` timestamp.
+**Important:** Use the Write tool to write the full JSON file. Do NOT use Edit for JSON — always read, modify in memory, write the whole file to avoid formatting issues.
 
 ### 8. Reciprocal Update
 
 Use AskUserQuestion:
-> "Update [target]'s dependencies.md with the reverse relationship?"
+> "Update [target]'s dependencies.json with the reverse relationship?"
 - **Yes (Recommended)** — create or append the reverse entry
 - **No** — skip
 
-If yes: apply the same create-or-append logic to `[target-path]/.project-context/dependencies.md` with the reversed direction (upstream ↔ downstream) and the current project's name/path.
+If yes: apply the same create-or-append logic to `[target-path]/.project-context/dependencies.json` with the reversed direction (upstream ↔ downstream) and the current project's name/path.
 
 ### 9. Confirmation
 
@@ -148,17 +133,17 @@ Added dependency:
   What: [what]
 
 Files modified:
-  ✓ .project-context/dependencies.md
-  ✓ [target-path]/.project-context/dependencies.md (reciprocal)
+  ✓ .project-context/dependencies.json
+  ✓ [target-path]/.project-context/dependencies.json (reciprocal)
 ```
 
 ## Edge Cases
 
 ### Target has no .project-context/
-> "The target has no `.project-context/`. Create one with just `dependencies.md`, or skip reciprocal?"
+> "The target has no `.project-context/`. Create one with just `dependencies.json`, or skip reciprocal?"
 
 ### Duplicate dependency
-If target already in the same direction's table:
+If target already in the same direction's array (match by `project` field):
 > "[target] is already listed as [direction]. Update the existing entry instead?"
 
 ### Self-dependency

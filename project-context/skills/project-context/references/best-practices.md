@@ -16,7 +16,7 @@
 | `state.md` | Every session start/end | Let it grow beyond ~50 lines |
 | `progress.md` | Tasks complete/start | Track micro-tasks |
 | `patterns.md` | New pattern established | Document obvious patterns |
-| `dependencies.md` | Dependencies added/removed | List every import — just boundaries |
+| `dependencies.json` | Dependencies added/removed | List every import — just key boundaries |
 
 ## Staleness Indicators
 
@@ -27,7 +27,7 @@
 | `state.md` | >1 day during active development |
 | `progress.md` | >3 days during active development |
 | `patterns.md` | >14 days + new patterns in code |
-| `dependencies.md` | >30 days + new dependencies added |
+| `dependencies.json` | >30 days + new dependencies added |
 
 ## Mermaid Diagrams
 
@@ -49,7 +49,7 @@ project-context uses HTML comment markers to delimit managed sections:
 - Content outside markers is never modified
 - Safe to run init/update multiple times (idempotent)
 
-## Monorepo / dependencies.md
+## Monorepo / dependencies.json
 
 ### When to Use
 - Monorepos with 2+ subprojects that share code, APIs, or types
@@ -63,7 +63,7 @@ project-context uses HTML comment markers to delimit managed sections:
 | **Paths** | Use relative paths from the project root (`../shared`, `../api`) |
 | **Integration Points** | List key files at boundaries, not every import |
 | **Impact Rules** | Focus on breaking-change scenarios only |
-| **Staleness** | `dependencies.md` changes rarely (30-day threshold) — update when deps change |
+| **Staleness** | `dependencies.json` changes rarely (30-day threshold) — update when deps change |
 
 ### Reciprocal Declarations
 
@@ -73,7 +73,7 @@ If `api` lists `shared` as upstream, then `shared` should list `api` as downstre
 
 When working in a subproject:
 1. Read that subproject's `.project-context/` first
-2. Check `dependencies.md` for upstream/downstream relationships
+2. Check `dependencies.json` for upstream/downstream relationships
 3. Only pull in a dependency's `brief.md` + `architecture.md` when touching integration boundaries
 4. Never load a dependency's `state.md` or `progress.md` — that's their internal concern
 

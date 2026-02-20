@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 
-CONTEXT_FILES = ["brief.md", "architecture.md", "state.md", "progress.md", "patterns.md", "dependencies.md"]
+CONTEXT_FILES = ["brief.md", "architecture.md", "state.md", "progress.md", "patterns.md", "dependencies.json"]
 
 STALENESS_DAYS = {
     "brief.md": 30,
@@ -26,7 +26,7 @@ STALENESS_DAYS = {
     "state.md": 1,
     "progress.md": 3,
     "patterns.md": 14,
-    "dependencies.md": 30,
+    "dependencies.json": 30,
 }
 
 MANAGED_SECTION_START = "<!-- PROJECT-CONTEXT:START -->"
@@ -42,7 +42,7 @@ Always read `.project-context/` files when starting work:
 - `state.md` — Current position, blockers, next action
 - `progress.md` — Completed/in-progress/upcoming work
 - `patterns.md` — Established patterns and learnings
-- `dependencies.md` — Cross-project dependencies (monorepo)
+- `dependencies.json` — Cross-project dependencies (monorepo)
 
 <!-- PROJECT-CONTEXT:END -->
 """
@@ -57,7 +57,7 @@ Before executing tasks, read `.project-context/` files:
 - `state.md` — Current position and blockers
 - `progress.md` — Work status
 - `patterns.md` — Established patterns
-- `dependencies.md` — Cross-project dependencies (monorepo)
+- `dependencies.json` — Cross-project dependencies (monorepo)
 
 <!-- PROJECT-CONTEXT:END -->
 """
@@ -72,71 +72,24 @@ def find_context_dir(start_dir="."):
 
 
 def parse_dependencies(context_dir):
-    """Parse dependencies.md and return structured dependency data.
+    """Parse dependencies.json and return structured dependency data.
 
-    Parses the markdown tables in Upstream and Downstream sections.
-    Returns dict with upstream, downstream lists and raw integration/impact text.
+    Returns dict with upstream, downstream lists, or None if file missing.
     """
-    deps_file = context_dir / "dependencies.md"
+    deps_file = context_dir / "dependencies.json"
     if not deps_file.exists():
         return None
 
-    content = deps_file.read_text()
-    result = {
-        "upstream": [],
-        "downstream": [],
-        "integration_points": [],
-        "impact_rules": [],
+    try:
+        data = json.loads(deps_file.read_text())
+    except (json.JSONDecodeError, ValueError):
+        return None
+
+    # Ensure expected keys exist with defaults
+    return {
+        "upstream": data.get("upstream", []),
+        "downstream": data.get("downstream", []),
     }
-
-    # Parse markdown tables in Upstream/Downstream sections
-    # Table row pattern: | project | path | what | notes |
-    table_row_re = re.compile(
-        r'^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]*?)\s*\|$'
-    )
-
-    current_section = None
-    for line in content.splitlines():
-        stripped = line.strip()
-
-        # Detect section headers
-        if re.match(r'^##\s+Upstream', stripped, re.IGNORECASE):
-            current_section = "upstream"
-            continue
-        elif re.match(r'^##\s+Downstream', stripped, re.IGNORECASE):
-            current_section = "downstream"
-            continue
-        elif re.match(r'^##\s+Integration', stripped, re.IGNORECASE):
-            current_section = "integration"
-            continue
-        elif re.match(r'^##\s+Impact', stripped, re.IGNORECASE):
-            current_section = "impact"
-            continue
-        elif stripped.startswith("## "):
-            current_section = None
-            continue
-
-        if current_section in ("upstream", "downstream"):
-            m = table_row_re.match(stripped)
-            if m:
-                project, path, what, notes = m.groups()
-                # Skip header and separator rows
-                if project.strip() in ("Project", "---", "") or "---" in path:
-                    continue
-                result[current_section].append({
-                    "project": project.strip(),
-                    "path": path.strip(),
-                    "what": what.strip(),
-                    "notes": notes.strip(),
-                })
-
-        elif current_section == "integration" and stripped.startswith("- "):
-            result["integration_points"].append(stripped[2:])
-
-        elif current_section == "impact" and stripped.startswith("- "):
-            result["impact_rules"].append(stripped[2:])
-
-    return result
 
 
 def cmd_status(args):
@@ -255,7 +208,7 @@ def cmd_validate(args):
         fpath = context_dir / fname
         if not fpath.exists():
             # dependencies.md is optional
-            if fname == "dependencies.md":
+            if fname == "dependencies.json":
                 continue
             if fname == "state.md":
                 issues.append({"file": fname, "severity": "warning", "message": "state.md missing — add for session continuity"})
@@ -264,6 +217,18 @@ def cmd_validate(args):
             continue
 
         content = fpath.read_text()
+
+        # JSON file validation (dependencies.json)
+        if fname.endswith(".json"):
+            try:
+                data = json.loads(content)
+                if not data.get("upstream") and not data.get("downstream"):
+                    issues.append({"file": fname, "severity": "warning", "message": f"{fname} has no upstream or downstream dependencies"})
+            except (json.JSONDecodeError, ValueError) as e:
+                issues.append({"file": fname, "severity": "error", "message": f"{fname} is invalid JSON: {e}"})
+            continue
+
+        # Markdown file validation
         lines = content.splitlines()
 
         # Check if file is essentially empty (only template markers)
@@ -300,7 +265,7 @@ def cmd_validate(args):
             dep_path = (context_dir.parent / dep["path"]).resolve()
             if not dep_path.is_dir():
                 issues.append({
-                    "file": "dependencies.md",
+                    "file": "dependencies.json",
                     "severity": "warning",
                     "message": f"Dependency '{dep['project']}' path not found: {dep['path']}"
                 })
@@ -309,7 +274,7 @@ def cmd_validate(args):
                 dep_context = dep_path / ".project-context"
                 if not dep_context.is_dir():
                     issues.append({
-                        "file": "dependencies.md",
+                        "file": "dependencies.json",
                         "severity": "info",
                         "message": f"Dependency '{dep['project']}' at {dep['path']} has no .project-context/ — consider initializing it"
                     })
@@ -373,7 +338,7 @@ def cmd_deps(args):
     if not deps:
         print(json.dumps({
             "has_dependencies": False,
-            "message": "No dependencies.md found.",
+            "message": "No dependencies.json found.",
             "hint": "Run /project-context:add-dependency to declare cross-project relationships"
         }))
         return 0

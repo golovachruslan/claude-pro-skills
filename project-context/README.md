@@ -80,7 +80,7 @@ The plugin creates 5+1 files in `.project-context/`:
 | `state.md` | Current position, blockers, next action | Every session |
 | `progress.md` | Completed/in-progress/upcoming work | Multiple times per week |
 | `patterns.md` | Established patterns and learnings | As patterns emerge |
-| `dependencies.md` | Cross-project dependencies (optional, monorepo) | On dependency changes |
+| `dependencies.json` | Cross-project dependencies (optional, monorepo) | On dependency changes |
 
 ## Commands
 
@@ -171,7 +171,7 @@ Check context files for:
 
 ## Monorepo Support
 
-For monorepos with multiple subprojects, each subproject maintains its own `.project-context/` directory. The optional `dependencies.md` file declares cross-project relationships using a **federated dependency graph** model.
+For monorepos with multiple subprojects, each subproject maintains its own `.project-context/` directory. The optional `dependencies.json` file declares cross-project relationships using a **federated dependency graph** model.
 
 ### Structure
 
@@ -187,40 +187,36 @@ monorepo/
 │   ├── state.md
 │   ├── progress.md
 │   ├── patterns.md
-│   └── dependencies.md            # Declares: consumes shared, consumed by web
+│   └── dependencies.json          # Declares: consumes shared, consumed by web
 ├── packages/web/.project-context/ # Web subproject
 │   └── ...
 └── packages/shared/.project-context/
     └── ...
 ```
 
-### dependencies.md Format
+### dependencies.json Format
 
 Each subproject declares its upstream (consumes) and downstream (consumed by) relationships:
 
-```markdown
-# Dependencies
-
-## Upstream (Consumes)
-
-| Project | Path | What | Notes |
-|---------|------|------|-------|
-| shared | ../shared | Types, validation utilities | Core domain types |
-
-## Downstream (Consumed By)
-
-| Project | Path | What | Notes |
-|---------|------|------|-------|
-| web | ../web | REST API endpoints | v2 API |
-
-## Integration Points
-
-Key files/interfaces at dependency boundaries.
-
-## Impact Rules
-
-When changing this project, consider:
-- **Breaking API changes** → Notify: web
+```json
+{
+  "upstream": [
+    {
+      "project": "shared",
+      "path": "../shared",
+      "what": "Types, validation utilities",
+      "note": "Core domain types"
+    }
+  ],
+  "downstream": [
+    {
+      "project": "web",
+      "path": "../web",
+      "what": "REST API endpoints",
+      "note": "v2 API"
+    }
+  ]
+}
 ```
 
 ### Adding Dependencies
@@ -228,12 +224,15 @@ When changing this project, consider:
 ```bash
 # Interactive — discovers siblings, prompts for direction/target, updates both sides
 /project-context:add-dependency
+
+# With path — skips project discovery, asks the rest interactively
+/project-context:add-dependency ../shared
 ```
 
 The command handles:
 - Discovering sibling projects with `.project-context/`
 - Prompting for direction (upstream/downstream), target, and what's shared
-- Creating `dependencies.md` if it doesn't exist
+- Creating `dependencies.json` if it doesn't exist
 - Offering reciprocal updates to the target project
 
 ### Viewing Dependencies
@@ -247,7 +246,7 @@ python manage_context.py deps --dir packages/api
 
 When working in a subproject:
 1. Read that subproject's `.project-context/` first
-2. Check `dependencies.md` for upstream/downstream relationships
+2. Check `dependencies.json` for upstream/downstream relationships
 3. When touching integration boundaries, pull in the dependency's `brief.md` + `architecture.md`
 4. Never load a dependency's `state.md` or `progress.md` — that's their internal concern
 
@@ -357,7 +356,7 @@ Keep this managed block so project-context commands can refresh the instructions
 ├── state.md           # Current position, blockers, next action
 ├── progress.md        # Completed/in-progress/upcoming work
 ├── patterns.md        # Established patterns and learnings
-├── dependencies.md    # Cross-project dependencies (optional, monorepo)
+├── dependencies.json  # Cross-project dependencies (optional, monorepo)
 ├── continue.md        # Session handoff (created by /pause)
 └── plans/             # Saved implementation plans
 ```
@@ -366,7 +365,7 @@ Keep this managed block so project-context commands can refresh the instructions
 
 | Feature | Cline Memory Bank | Project Context |
 |---------|-------------------|-----------------|
-| Files | 6 files | 5+1 files (brief, architecture, state, progress, patterns + dependencies) |
+| Files | 6 files | 5 markdown + dependencies.json (optional) |
 | Diagrams | Text descriptions | Mermaid diagrams |
 | Updates | Manual | Multiple sources (chat, scan, input) |
 | Validation | None | Built-in validation |

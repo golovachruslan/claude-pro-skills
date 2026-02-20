@@ -163,50 +163,43 @@ graph TB
 *Last updated: YYYY-MM-DD*
 ```
 
-## dependencies.md
+## dependencies.json
 
 For monorepo subprojects that need to declare relationships with sibling projects.
 This file is optional — only needed when a project has cross-project dependencies.
 
-```markdown
-# Dependencies
-
-## Upstream (Consumes)
-
-Projects this subproject depends on.
-
-| Project | Path | What | Notes |
-|---------|------|------|-------|
-| shared | ../shared | Types, validation utilities | Core domain types |
-| database | ../database | Schema definitions | Read-only access |
-
-## Downstream (Consumed By)
-
-Projects that depend on this subproject.
-
-| Project | Path | What | Notes |
-|---------|------|------|-------|
-| web | ../web | REST API endpoints | v2 API |
-
-## Integration Points
-
-Key files/interfaces at dependency boundaries.
-
-### shared → this
-- Types: `packages/shared/src/types/api.ts`
-- Validators: `packages/shared/src/validators/`
-
-### this → web
-- API spec: `docs/openapi.yaml`
-- Client SDK: `src/client/`
-
-## Impact Rules
-
-When changing this project, consider:
-- **Breaking API changes** → Notify: web
-- **Schema changes** → Coordinate with: database
-- **Type changes** → Update: shared types first
-
----
-*Last updated: YYYY-MM-DD*
+```json
+{
+  "upstream": [
+    {
+      "project": "shared",
+      "path": "../shared",
+      "what": "Types, validation utilities",
+      "note": "Core domain types"
+    },
+    {
+      "project": "database",
+      "path": "../database",
+      "what": "Schema definitions",
+      "note": "Read-only access"
+    }
+  ],
+  "downstream": [
+    {
+      "project": "web",
+      "path": "../web",
+      "what": "REST API endpoints",
+      "note": "v2 API"
+    }
+  ]
+}
 ```
+
+**Fields per entry:**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `project` | Yes | Name of the dependency |
+| `path` | Yes | Relative path from this project (e.g., `../shared`) |
+| `what` | Yes | What is shared (types, API, utilities, etc.) |
+| `note` | No | Additional context (can be empty string) |

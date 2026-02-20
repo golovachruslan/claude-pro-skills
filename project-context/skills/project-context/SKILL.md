@@ -16,14 +16,14 @@ Provide informed responses about project state by reading structured context fil
 | `state.md` | Current position, blockers, next action | Every session |
 | `progress.md` | Completed/in-progress/upcoming work | Multiple times per week |
 | `patterns.md` | Established patterns and learnings | As patterns emerge |
-| `dependencies.md` | Cross-project dependencies (monorepo, optional) | On dependency changes |
+| `dependencies.json` | Cross-project dependencies (monorepo, optional) | On dependency changes |
 
 ## Workflow
 
 ### 1. Check for Context Files
 
 ```bash
-ls .project-context/*.md 2>/dev/null
+ls .project-context/*.md .project-context/*.json 2>/dev/null
 ```
 
 If not found: "No project context found. Run `/project-context:init` to set up."
@@ -38,8 +38,8 @@ If not found: "No project context found. Run `/project-context:init` to set up."
 | "Architecture/how it works" | architecture.md | patterns.md |
 | "Tech stack" | architecture.md | - |
 | "What patterns do we use?" | patterns.md | architecture.md |
-| "What depends on this?" | dependencies.md | architecture.md |
-| "Cross-project impact?" | dependencies.md | state.md |
+| "What depends on this?" | dependencies.json | architecture.md |
+| "Cross-project impact?" | dependencies.json | state.md |
 | General context | All files | - |
 
 ### 3. Synthesize Response
@@ -62,19 +62,19 @@ If context seems stale (state.md >1 day, progress.md >3 days during active dev):
 
 ## Monorepo Support
 
-For monorepos with multiple subprojects, each subproject can have its own `.project-context/` with an optional `dependencies.md` declaring cross-project relationships.
+For monorepos with multiple subprojects, each subproject can have its own `.project-context/` with an optional `dependencies.json` declaring cross-project relationships.
 
 ### Context Resolution (Federated Model)
 
 1. Always load local `.project-context/`
-2. When touching integration boundaries, check `dependencies.md` for upstream/downstream
+2. When touching integration boundaries, check `dependencies.json` for upstream/downstream
 3. On-demand: read a dependency's `brief.md` + `architecture.md` for cross-project context
 
 ### Adding Dependencies
 
 Use `/project-context:add-dependency` to interactively declare a relationship. It handles:
 - Discovering sibling projects
-- Creating or updating `dependencies.md`
+- Creating or updating `dependencies.json`
 - Offering reciprocal updates to the target project
 
 ### Viewing Dependencies
@@ -86,5 +86,5 @@ python manage_context.py deps --dir .
 
 ## Reference
 
-- `references/file-templates.md` — Template structures for each file (including dependencies.md)
+- `references/file-templates.md` — Template structures for each file (including dependencies.json)
 - `references/best-practices.md` — Guidelines for maintaining context

@@ -13,7 +13,7 @@ allowed-tools:
 
 # Add Cross-Project Dependency
 
-Add a dependency to the current subproject's `dependencies.md`.
+Add a dependency to the current subproject's `dependencies.json`.
 
 ## Parameter
 
