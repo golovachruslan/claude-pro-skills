@@ -12,7 +12,31 @@ allowed-tools:
 
 # Add Cross-Project Dependency
 
-Interactively add a dependency relationship between subprojects in a monorepo. Creates `dependencies.md` if needed, appends to it if it exists, and optionally updates the other side (reciprocal declaration).
+Add a dependency relationship between subprojects in a monorepo. Creates `dependencies.md` if needed, appends to it if it exists, and optionally updates the other side (reciprocal declaration).
+
+## Parameters
+
+The command accepts inline parameters. Any parameter not provided is gathered interactively.
+
+| Parameter | Position/Flag | Description |
+|-----------|---------------|-------------|
+| direction | 1st positional | `upstream` or `downstream` |
+| project-path | 2nd positional | Relative path to target (e.g., `../shared`) |
+| `--what` | Flag | What is shared (e.g., "Types, validators") |
+| `--note` | Flag | Optional note (e.g., "Core domain types") |
+| `--no-reciprocal` | Flag | Skip reciprocal update on the target project |
+
+### Parse Rules
+
+Extract from the user's command invocation:
+
+1. **Direction**: first word after the command name — must be exactly `upstream` or `downstream`
+2. **Project path**: next non-flag argument — a relative path (starts with `../` or `./`)
+3. **--what "..."**: value after `--what` flag
+4. **--note "..."**: value after `--note` flag
+5. **--no-reciprocal**: presence of flag (boolean)
+
+If a value is ambiguous or missing, ask for it. Never guess.
 
 ## Workflow
 
@@ -29,39 +53,53 @@ If no `.project-context/` exists:
 
 Read `brief.md` if available to know the current project name.
 
-### 2. Discover Sibling Projects
+### 2. Resolve Provided Params
 
-Scan for other `.project-context/` directories in the monorepo:
+Parse any inline params from the command invocation. Track which are provided vs. missing:
 
-```bash
-# Look for sibling project contexts (up to 3 levels)
-find .. -maxdepth 3 -name ".project-context" -type d 2>/dev/null
+```
+provided = {direction, path, what, note, no_reciprocal}  # from params
+missing  = required - provided
 ```
 
-Build a list of known sibling projects with their names (from `brief.md`) and paths.
+### 3. Gather Missing: Direction
 
-### 3. Ask: Direction and Target
+**Skip if provided as param.**
 
-Use AskUserQuestion to gather:
-
-**Question 1: Direction**
+Use AskUserQuestion:
 > "What kind of dependency are you adding?"
 - **Upstream (this project consumes)** — e.g., "we import types from shared"
 - **Downstream (this project is consumed by)** — e.g., "web calls our API"
 
-**Question 2: Target project**
+### 4. Gather Missing: Target Project
 
-If sibling projects were discovered, present them as options:
+**Skip if provided as param.**
+
+Scan for sibling `.project-context/` directories:
+
+```bash
+find .. -maxdepth 3 -name ".project-context" -type d 2>/dev/null
+```
+
+If siblings found, present as options via AskUserQuestion:
 > "Which project?"
-- List discovered siblings by name
+- List discovered siblings by name and relative path
 - "Other" for manual path entry
 
 If no siblings found, ask for the relative path directly:
 > "What is the relative path to the dependency? (e.g., `../shared`, `../../packages/api`)"
 
-### 4. Ask: What is Shared
+### 5. Resolve Target Name
 
-> "What does this project consume from / expose to [target]?"
+Derive the target project name:
+1. Read `[target-path]/.project-context/brief.md` and extract `**Project Name:**`
+2. Fall back to the directory name from the path
+
+### 6. Gather Missing: What is Shared
+
+**Skip if provided via `--what`.**
+
+> "What does this project [consume from / expose to] [target]?"
 
 Examples to guide the user:
 - Types, interfaces, or schemas
@@ -70,16 +108,11 @@ Examples to guide the user:
 - Database schemas or migrations
 - Event definitions or message formats
 
-### 5. Ask: Integration Points (Optional)
+### 7. Gather Missing: Notes
 
-> "Any key files or interfaces at the boundary? (optional, press enter to skip)"
+**Skip if provided via `--note`.** If not provided and not interactive, default to empty.
 
-Examples:
-- `src/types/api.ts`
-- `docs/openapi.yaml`
-- `src/client/sdk.ts`
-
-### 6. Create or Update dependencies.md
+### 8. Create or Update dependencies.md
 
 #### If dependencies.md doesn't exist — create from template:
 
@@ -92,7 +125,6 @@ Projects this subproject depends on.
 
 | Project | Path | What | Notes |
 |---------|------|------|-------|
-| [target] | [relative-path] | [what-shared] | [notes] |
 
 ## Downstream (Consumed By)
 
@@ -103,38 +135,43 @@ Projects that depend on this subproject.
 
 ## Integration Points
 
-[If user provided integration points, list them here]
+Key files/interfaces at dependency boundaries.
 
 ## Impact Rules
 
 When changing this project, consider:
-- [Generated from the dependency added]
 
 ---
 *Last updated: [current date]*
 ```
 
-Place the dependency row in the correct section (Upstream or Downstream).
+Then insert the new row into the correct section.
 
 #### If dependencies.md exists — append row:
 
 Read the existing file. Add a new table row to the appropriate section (Upstream or Downstream). Do NOT overwrite existing entries.
 
-When editing, find the last row in the target table and insert after it. Use the Edit tool for precision.
+**Row format:**
+```
+| [target-name] | [relative-path] | [what] | [note] |
+```
 
-### 7. Offer Reciprocal Update
+When editing, find the last data row in the target table (after the `|---|` separator, before the next `##` or empty line) and insert after it. Use the Edit tool for precision.
 
-After updating the current project, ask:
+### 9. Reciprocal Update
 
+**Skip if `--no-reciprocal` flag is set.**
+
+Otherwise ask via AskUserQuestion:
 > "[target] should also declare this relationship (as [reverse-direction]). Update [target]'s dependencies.md too?"
-- **Yes** — Update or create `[target-path]/.project-context/dependencies.md` with the reverse entry
-- **No** — Skip (warn: `deps-validate` will flag this as a mismatch)
+- **Yes (Recommended)** — Update or create the target's `dependencies.md`
+- **No** — Skip
 
-If yes, apply the same logic (create or append) to the target project's `dependencies.md` with the reversed direction:
+If yes, apply the same create-or-append logic to `[target-path]/.project-context/dependencies.md` with the reversed direction:
 - If we added upstream here → add downstream there
 - If we added downstream here → add upstream there
 
-### 8. Confirmation
+### 10. Confirmation
 
 Display summary:
 
@@ -146,8 +183,6 @@ Added dependency:
 Files modified:
   ✓ .project-context/dependencies.md
   ✓ [target-path]/.project-context/dependencies.md (reciprocal)
-
-Run `python manage_context.py deps-validate --root [monorepo-root]` to verify the full graph.
 ```
 
 ## Edge Cases
@@ -161,3 +196,10 @@ If the target project already appears in the same direction's table, warn:
 
 ### Self-dependency
 Reject: "A project cannot depend on itself."
+
+### Invalid direction param
+If direction is not `upstream` or `downstream`, treat it as unprovided and ask interactively.
+
+### Invalid path param
+If path doesn't resolve to an existing directory, warn and ask for correction:
+> "Path `[path]` doesn't exist. Enter the correct relative path:"
