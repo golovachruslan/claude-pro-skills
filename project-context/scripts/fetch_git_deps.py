@@ -265,7 +265,7 @@ def cmd_fetch(args):
         print(json.dumps({
             "fetched": 0,
             "message": "No git link dependencies found in dependencies.json",
-            "hint": "Run /project-context:add-git-dependency to add one"
+            "hint": "Run /project-context:add-dependency <git-url> to add one"
         }))
         return 0
 

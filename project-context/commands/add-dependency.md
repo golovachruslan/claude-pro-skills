@@ -1,7 +1,7 @@
 ---
 name: project-context:add-dependency
-description: Add a cross-project dependency to the current subproject's dependencies.md in a monorepo
-argument-hint: "<project-path>"
+description: Add a cross-project dependency — local path (monorepo) or git URL (remote repo)
+argument-hint: "<path-or-git-url>"
 allowed-tools:
   - Read
   - Write
@@ -13,26 +13,29 @@ allowed-tools:
 
 # Add Cross-Project Dependency
 
-Add a dependency to the current subproject's `dependencies.json`.
+Add a dependency to the current project's `dependencies.json`. Accepts either a local path (monorepo sibling) or a git URL (remote repository — only `.project-context/` is fetched).
 
 ## Parameter
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| `<project-path>` | No | Relative path to target project (e.g., `../shared`) |
+| `<path-or-git-url>` | No | Relative path (e.g., `../shared`) or git URL (e.g., `https://github.com/org/repo.git`) |
 
-If omitted, discovers sibling projects and presents them as choices.
+If omitted, asks whether to add a local or git dependency, then proceeds interactively.
 
 ## Examples
 
 ```bash
-# With path — asks direction/what/notes interactively
+# Local path — asks direction/what/notes interactively
 /project-context:add-dependency ../shared
 
-# Fully interactive
+# Git URL — asks ref/name/direction/what/notes interactively
+/project-context:add-dependency https://github.com/org/auth-service.git
+
+# Fully interactive — asks dependency type first
 /project-context:add-dependency
 ```
 
 ## Workflow
 
-Invoke the `add-dependency` skill — it resolves the path, then uses AskUserQuestion to gather direction, what's shared, and notes.
+Invoke the `add-dependency` skill — it auto-detects local path vs git URL from the argument, then uses AskUserQuestion to gather the remaining details.

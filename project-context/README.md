@@ -249,33 +249,26 @@ Both types can coexist in the same `dependencies.json`:
 }
 ```
 
-### Adding Local Dependencies
+### Adding Dependencies
 
 ```bash
-# Interactive — discovers siblings, prompts for direction/target, updates both sides
+# Local path — discovers siblings, prompts for direction/target, updates both sides
 /project-context:add-dependency
-
-# With path — skips project discovery, asks the rest interactively
 /project-context:add-dependency ../shared
+
+# Git URL — asks ref/name/direction/what/notes interactively, fetches remote context
+/project-context:add-dependency https://github.com/org/auth-service.git
 ```
 
-The command handles:
-- Discovering sibling projects with `.project-context/`
-- Prompting for direction (upstream/downstream), target, and what's shared
-- Creating `dependencies.json` if it doesn't exist
-- Offering reciprocal updates to the target project
+The command auto-detects whether the argument is a local path or git URL. When called without arguments, it asks which type to add.
 
-### Adding Git Link Dependencies
+**Local path** dependencies:
+- Discover sibling projects with `.project-context/`
+- Prompt for direction (upstream/downstream), target, and what's shared
+- Create `dependencies.json` if it doesn't exist
+- Offer reciprocal updates to the target project
 
-```bash
-# With URL — asks ref/direction/what/notes interactively
-/project-context:add-git-dependency https://github.com/org/auth-service.git
-
-# Fully interactive
-/project-context:add-git-dependency
-```
-
-Git link dependencies:
+**Git link** dependencies:
 - Fetch only `.project-context/` from the remote repo (no application code)
 - Cache context in `.project-context/.deps-cache/<project>/`
 - Use `git sparse-checkout` for minimal downloads
