@@ -49,13 +49,16 @@ project-context uses HTML comment markers to delimit managed sections:
 - Content outside markers is never modified
 - Safe to run init/update multiple times (idempotent)
 
-## Monorepo / dependencies.json
+## Dependencies (dependencies.json)
 
 ### When to Use
 - Monorepos with 2+ subprojects that share code, APIs, or types
 - Any project that imports from or exports to a sibling project
+- Cross-repository dependencies where you need the other project's context (git link)
 
-### Guidelines
+### Local Path Dependencies
+
+For monorepo siblings that exist on the same filesystem.
 
 | Aspect | Guideline |
 |--------|-----------|
@@ -65,17 +68,31 @@ project-context uses HTML comment markers to delimit managed sections:
 | **Impact Rules** | Focus on breaking-change scenarios only |
 | **Staleness** | `dependencies.json` changes rarely (30-day threshold) — update when deps change |
 
-### Reciprocal Declarations
+### Reciprocal Declarations (Local)
 
 If `api` lists `shared` as upstream, then `shared` should list `api` as downstream. The `/project-context:add-dependency` command handles this automatically by offering to update both sides.
 
-### Context Resolution in Monorepos
+### Git Link Dependencies
+
+For remote repositories not on the local filesystem. Only `.project-context/` is fetched — no application code.
+
+| Aspect | Guideline |
+|--------|-----------|
+| **When to use** | External services, shared libraries in separate repos, cross-team dependencies |
+| **URL format** | HTTPS preferred (`https://github.com/org/repo.git`); SSH also supported |
+| **Ref** | Track a stable branch (`main`) or release tag; avoid tracking volatile branches |
+| **Fetching** | Run `/project-context:fetch-deps` after adding, or to refresh stale caches |
+| **Cache** | Stored in `.project-context/.deps-cache/<project>/` — auto-gitignored |
+| **No reciprocal** | Cannot update remote repos; the other project must independently add a reverse link |
+
+### Context Resolution
 
 When working in a subproject:
 1. Read that subproject's `.project-context/` first
 2. Check `dependencies.json` for upstream/downstream relationships
-3. Only pull in a dependency's `brief.md` + `architecture.md` when touching integration boundaries
-4. Never load a dependency's `state.md` or `progress.md` — that's their internal concern
+3. For local deps: pull in `brief.md` + `architecture.md` when touching integration boundaries
+4. For git link deps: read from `.deps-cache/<project>/.project-context/` instead
+5. Never load a dependency's `state.md` or `progress.md` — that's their internal concern
 
 ### Monorepo Initialization
 
@@ -91,3 +108,5 @@ Each subproject gets its own `/project-context:init`. The root can also have a `
 6. **Duplicating CLAUDE.md** → Reference context files, don't duplicate
 7. **One-way dependency declarations** → Always declare both upstream and downstream
 8. **Loading all dependency contexts** → Only load brief + architecture, not state/progress
+9. **Forgetting to fetch git deps** → Run `/project-context:fetch-deps` after adding git link deps
+10. **Tracking volatile branches** → Use stable refs (main, tags) for git link dependencies

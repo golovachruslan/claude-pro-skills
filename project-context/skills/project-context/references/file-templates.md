@@ -165,8 +165,9 @@ graph TB
 
 ## dependencies.json
 
-For monorepo subprojects that need to declare relationships with sibling projects.
+For projects that need to declare relationships with other projects.
 This file is optional — only needed when a project has cross-project dependencies.
+Supports two dependency types: **local path** (monorepo siblings) and **git link** (remote repositories).
 
 ```json
 {
@@ -178,10 +179,11 @@ This file is optional — only needed when a project has cross-project dependenc
       "note": "Core domain types"
     },
     {
-      "project": "database",
-      "path": "../database",
-      "what": "Schema definitions",
-      "note": "Read-only access"
+      "project": "auth-service",
+      "git": "https://github.com/org/auth-service.git",
+      "ref": "main",
+      "what": "Auth API types, JWT schemas",
+      "note": "External auth service"
     }
   ],
   "downstream": [
@@ -195,7 +197,7 @@ This file is optional — only needed when a project has cross-project dependenc
 }
 ```
 
-**Fields per entry:**
+**Fields per entry (local path dependency):**
 
 | Field | Required | Description |
 |-------|----------|-------------|
@@ -203,3 +205,16 @@ This file is optional — only needed when a project has cross-project dependenc
 | `path` | Yes | Relative path from this project (e.g., `../shared`) |
 | `what` | Yes | What is shared (types, API, utilities, etc.) |
 | `note` | No | Additional context (can be empty string) |
+
+**Fields per entry (git link dependency):**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `project` | Yes | Name of the dependency |
+| `git` | Yes | Git repository URL (HTTPS or SSH) |
+| `ref` | No | Branch, tag, or commit to track (default: `main`) |
+| `what` | Yes | What is shared (types, API, utilities, etc.) |
+| `note` | No | Additional context (can be empty string) |
+
+A dependency entry uses either `path` (local) or `git` (remote), never both.
+Git link dependencies are fetched into `.project-context/.deps-cache/<project>/` via `/project-context:fetch-deps`.
