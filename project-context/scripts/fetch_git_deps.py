@@ -2,8 +2,9 @@
 """
 Fetch .project-context/ from git link dependencies.
 
-Clones remote repos to a temp directory (depth=1), copies only the context
-files into .project-context/.deps-cache/<project>/, then cleans up.
+Uses git sparse-checkout (--filter=blob:none --sparse) to download only the
+.project-context/ directory from remote repos, then copies the context files
+into .project-context/.deps-cache/<project>/ and cleans up the temp clone.
 No .git/ directories are retained — the cache is plain files.
 
 Usage:
@@ -87,7 +88,9 @@ def run_git(args, cwd=None, timeout=60):
 def fetch_single_dep(dep, cache_dir):
     """Fetch .project-context/ for a single git dependency.
 
-    Clones into a temp directory, copies context files to cache, cleans up.
+    Uses sparse-checkout (--filter=blob:none --sparse) so only the
+    .project-context/ directory is downloaded — no application code.
+    Copies context files to cache, then cleans up the temp clone.
     No .git/ is retained — cache contains only plain context files.
     """
     project = dep["project"]
@@ -106,12 +109,14 @@ def fetch_single_dep(dep, cache_dir):
     tmp_dir = None
     try:
         tmp_dir = Path(tempfile.mkdtemp(prefix=f"deps-{project}-"))
+        repo_dir = tmp_dir / "repo"
 
-        # Shallow clone
-        clone_args = ["clone", "--depth", "1"]
+        # Sparse clone — downloads tree objects but no file blobs yet,
+        # and initializes sparse-checkout in cone mode (root files only)
+        clone_args = ["clone", "--depth", "1", "--filter=blob:none", "--sparse"]
         if ref != "HEAD":
             clone_args += ["--branch", ref]
-        clone_args += [git_url, str(tmp_dir / "repo")]
+        clone_args += [git_url, str(repo_dir)]
 
         ok, _, err = run_git(clone_args, timeout=120)
         if not ok:
@@ -119,8 +124,16 @@ def fetch_single_dep(dep, cache_dir):
             result["error"] = f"git clone failed: {err}"
             return result
 
+        # Restrict checkout to only .project-context/ — triggers blob download
+        # for that directory only
+        ok, _, err = run_git(["sparse-checkout", "set", ".project-context"], cwd=repo_dir)
+        if not ok:
+            result["status"] = "error"
+            result["error"] = f"git sparse-checkout set failed: {err}"
+            return result
+
         # Check if .project-context/ exists in cloned repo
-        cloned_context = tmp_dir / "repo" / ".project-context"
+        cloned_context = repo_dir / ".project-context"
         if not cloned_context.is_dir():
             result["status"] = "no_context"
             result["message"] = "Remote repository has no .project-context/ directory"

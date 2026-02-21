@@ -178,7 +178,7 @@ After adding the entry, immediately fetch the remote `.project-context/`:
 python project-context/scripts/fetch_git_deps.py fetch --dir . --project [project-name]
 ```
 
-The script shallow-clones to a temp dir, copies only the context files into `.project-context/.deps-cache/[project-name]/`, then cleans up the clone. No `.git/` is retained.
+The script uses sparse-checkout (`--filter=blob:none --sparse`) to download only `.project-context/` from the remote — no application code is transferred. It copies the context files into `.project-context/.deps-cache/[project-name]/`, then cleans up the clone. No `.git/` is retained.
 
 ### B11. Confirmation
 

@@ -271,7 +271,7 @@ The command auto-detects whether the argument is a local path or git URL. When c
 **Git link** dependencies:
 - Fetch only `.project-context/` from the remote repo (no application code)
 - Cache context in `.project-context/.deps-cache/<project>/`
-- Shallow clone to temp, copy context files, discard clone — no `.git/` overhead
+- Sparse-checkout (`--filter=blob:none --sparse`) to download only `.project-context/`, copy context files, discard clone — no `.git/` overhead
 - Do not support reciprocal updates (cannot write to remote repos)
 
 ### Fetching / Refreshing Git Dependencies
@@ -284,7 +284,7 @@ The command auto-detects whether the argument is a local path or git URL. When c
 /project-context:add-dependency --fetch auth-service
 ```
 
-The fetch operation shallow-clones each remote to a temp directory, copies only the `.project-context/` files into `.deps-cache/<project>/` as flat files, then cleans up. No `.git/` is retained. The cache is auto-gitignored.
+The fetch operation uses sparse-checkout (`--filter=blob:none --sparse`) to download only the `.project-context/` directory from each remote — no application code is transferred. It copies the context files into `.deps-cache/<project>/` as flat files, then cleans up. No `.git/` is retained. The cache is auto-gitignored.
 
 ### Viewing Dependencies
 
