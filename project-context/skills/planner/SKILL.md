@@ -50,7 +50,10 @@ If context exists, read:
 - `architecture.md` — tech stack, system design
 - `patterns.md` — established conventions
 - `state.md` — current position, blockers
+- `dependencies.json` — cross-project relationships (if present)
 - `plans/*.md` — check for existing discussions/decisions
+
+If `dependencies.json` exists, build a Dependency Digest (see `project-context/skills/project-context/references/dependency-loading.md`). Use it in Step 4 to identify whether the plan touches integration boundaries and whether cross-project coordination tasks are needed.
 
 Use context to ask **informed** questions (reference specific tech, patterns, decisions).
 
@@ -111,12 +114,23 @@ Use templates from `references/planning-templates.md`. Key structure:
 #### Task 2: [Name]
 [Same structure]
 
+## Cross-Project Impact
+*(Include only when plan touches a dependency boundary — omit if no dependencies)*
+| Dependency | Direction | What's Affected | Action Needed |
+|---|---|---|---|
+| [project] | upstream/downstream | [from `what` field] | [coordinate / update / verify] |
+
 ## Risks & Mitigation
 [Key risks with strategies]
 
 ## Next Steps
 [What to do after planning]
 ```
+
+**Dependency coordination tasks** — when a plan task crosses a boundary from `dependencies.json`:
+- Add an explicit task: "Update shared types in `[dep path]`" or "Verify `[downstream]` still builds after API change"
+- Mark coordination tasks as dependencies of implementation tasks in the DAG
+- For git link deps with stale cache: add "Fetch latest `[dep]` context" as a prerequisite task
 
 **Task rules:**
 - 2-4 tasks per phase (keeps context fresh if using subagents or Agent Teams)

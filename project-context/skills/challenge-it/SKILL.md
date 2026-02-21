@@ -50,8 +50,8 @@ If `.project-context/` doesn't exist, skill works standalone.
 |--------|-------|---------------|
 | **Skeptic** | Assumptions & evidence | What are we assuming without validation? What if our premise is wrong? |
 | **Pragmatist** | Cost vs value | Is this the simplest approach? What's the ongoing maintenance cost? Over-engineered? |
-| **Chaos Engineer** | Failure modes | What could go wrong? Edge cases? Error handling? What breaks under load? |
-| **Architect** | Design fit | Does this align with existing architecture? Coupling? SOLID violations? Pattern consistency? |
+| **Chaos Engineer** | Failure modes | What could go wrong? Edge cases? Error handling? What breaks under load? Cross-project cascade failures? What breaks in downstream consumers if this is deployed? Upstream contract changes? |
+| **Architect** | Design fit | Does this align with existing architecture? Coupling? SOLID violations? Pattern consistency? Does this break contracts declared in `dependencies.json`? Alignment with upstream APIs? |
 | **Root Cause** | Problem diagnosis | Solving symptom or cause? Is the problem correctly identified? Band-aid or real fix? |
 | **Future Dev** | Maintainability | Will this make sense in 6 months? Readable? Testable? What context is needed to understand? |
 
@@ -68,6 +68,9 @@ ls .project-context/*.md 2>/dev/null
 - `.project-context/architecture.md` — Tech stack, system design
 - `.project-context/patterns.md` — Established patterns
 - `.project-context/brief.md` — Project goals and constraints
+- `.project-context/dependencies.json` — Cross-project relationships (if present)
+
+If `dependencies.json` exists, build a Dependency Digest (see `project-context/skills/project-context/references/dependency-loading.md`). Use it to evaluate integration risks across critics — especially Chaos Engineer (downstream cascade failures) and Architect (contract breakage).
 
 **Identify what's being challenged:**
 - Recent plan discussed in conversation
@@ -92,6 +95,11 @@ For each critic:
 - Use project context to make concerns specific
 - Reference actual patterns/code when relevant
 - If no significant concerns from a perspective, state: "No critical concerns from this perspective"
+
+**When dependencies exist:** Explicitly evaluate integration impact for each relevant critic:
+- **Chaos Engineer**: Does the change cascade to downstream consumers? What breaks in `[dep]` if this is deployed? Does it depend on an upstream that could change independently?
+- **Architect**: Does this change respect the contract described in dependencies.json? (`[dep]` provides `[what]` — does this still hold?)
+- If any downstream consumers are affected, raise the concern as **Important** or **Critical** depending on blast radius.
 
 ### 4. Synthesize and Prioritize
 

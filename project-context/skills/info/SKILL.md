@@ -26,6 +26,9 @@ If found, read files relevant to the question:
 | Current status, blockers | `state.md` |
 | What's done / in progress | `progress.md` |
 | Code conventions, learnings | `patterns.md` |
+| Dependencies, integrations, cross-project | `dependencies.json` + relevant dep's cached `brief.md` / `architecture.md` |
+
+When the question involves integration topics or a concept matching a dependency's `what` field (e.g., "how does auth work?" and upstream dep provides "Auth API types, JWT schemas"), also load that dependency's context. See `project-context/skills/project-context/references/dependency-loading.md` for loading rules (selective loading, never load dep's state/progress).
 
 Also check for `CLAUDE.md`, `README.md`, or similar project docs at the repo root — these often contain build commands, architecture notes, and conventions.
 

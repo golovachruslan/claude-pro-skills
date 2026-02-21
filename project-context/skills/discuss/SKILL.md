@@ -30,6 +30,9 @@ ls .project-context/*.md 2>/dev/null
 
 If exists, read `brief.md`, `architecture.md`, and `patterns.md` to understand the project. Reference specifics in your questions.
 
+**Also check for dependencies:**
+If `.project-context/dependencies.json` exists, build a Dependency Digest (see `project-context/skills/project-context/references/dependency-loading.md`). This gives you a concise map of what each dependency provides — used in Step 3 to surface integration gray areas.
+
 ### 2. Understand the Feature
 
 Ask the user to describe what they want to build. Listen for:
@@ -50,6 +53,13 @@ Based on the feature description and project context, identify 3-5 domain-specif
 | Data/Storage | Schema design, consistency, retention, migration strategy |
 | Integration | Sync vs async, error recovery, data mapping, auth flow |
 | Performance | Caching strategy, trade-offs, acceptable latency, fallback behavior |
+| Cross-project / Dep boundary | API contract changes, coordination timing, breaking changes, shared type updates, version sync |
+
+**When dependencies exist:** Compare the feature description against each dep's `what` field. If there's overlap (e.g., the feature involves "auth tokens" and an upstream dep provides "Auth API types, JWT schemas"), flag an integration gray area:
+- Upstream dep: "This touches [what] provided by `[project]` — do we need to coordinate changes upstream first?"
+- Downstream dep: "Downstream `[project]` consumes [what] from us — will this be a breaking change for them?"
+
+If the relevant dep has cached context, load its `brief.md` + `architecture.md` to ask more specific questions (see `dependency-loading.md` Step 3 for loading rules).
 
 **Present gray areas clearly:**
 ```
