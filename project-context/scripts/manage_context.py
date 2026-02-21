@@ -295,7 +295,7 @@ def cmd_validate(args):
                     issues.append({
                         "file": "dependencies.json",
                         "severity": "info",
-                        "message": f"Git dependency '{dep['project']}' context not cached — run /project-context:fetch-deps"
+                        "message": f"Git dependency '{dep['project']}' context not cached — run /project-context:add-dependency --fetch"
                     })
             elif "path" in dep:
                 # Local path dependency — validate path exists

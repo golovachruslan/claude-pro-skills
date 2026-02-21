@@ -81,7 +81,7 @@ For remote repositories not on the local filesystem. Only `.project-context/` is
 | **When to use** | External services, shared libraries in separate repos, cross-team dependencies |
 | **URL format** | HTTPS preferred (`https://github.com/org/repo.git`); SSH also supported |
 | **Ref** | Track a stable branch (`main`) or release tag; avoid tracking volatile branches |
-| **Fetching** | Run `/project-context:fetch-deps` after adding, or to refresh stale caches |
+| **Fetching** | Run `/project-context:add-dependency --fetch` to refresh stale caches |
 | **Cache** | Stored in `.project-context/.deps-cache/<project>/` — auto-gitignored |
 | **No reciprocal** | Cannot update remote repos; the other project must independently add a reverse link |
 
@@ -108,5 +108,5 @@ Each subproject gets its own `/project-context:init`. The root can also have a `
 6. **Duplicating CLAUDE.md** → Reference context files, don't duplicate
 7. **One-way dependency declarations** → Always declare both upstream and downstream
 8. **Loading all dependency contexts** → Only load brief + architecture, not state/progress
-9. **Forgetting to fetch git deps** → Run `/project-context:fetch-deps` after adding git link deps
+9. **Forgetting to fetch git deps** → Run `/project-context:add-dependency --fetch` to refresh cached contexts
 10. **Tracking volatile branches** → Use stable refs (main, tags) for git link dependencies

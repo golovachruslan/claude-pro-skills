@@ -217,4 +217,4 @@ Supports two dependency types: **local path** (monorepo siblings) and **git link
 | `note` | No | Additional context (can be empty string) |
 
 A dependency entry uses either `path` (local) or `git` (remote), never both.
-Git link dependencies are fetched into `.project-context/.deps-cache/<project>/` via `/project-context:fetch-deps`.
+Git link dependencies are fetched into `.project-context/.deps-cache/<project>/` via `/project-context:add-dependency --fetch`.

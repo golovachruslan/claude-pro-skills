@@ -277,14 +277,14 @@ The command auto-detects whether the argument is a local path or git URL. When c
 ### Fetching / Refreshing Git Dependencies
 
 ```bash
-# Fetch all git link dependencies
-/project-context:fetch-deps
+# Refresh all cached git deps
+/project-context:add-dependency --fetch
 
-# Fetch a specific dependency
-/project-context:fetch-deps auth-service
+# Refresh a specific dependency
+/project-context:add-dependency --fetch auth-service
 ```
 
-The fetch command shallow-clones each remote to a temp directory, copies only the `.project-context/` files into `.deps-cache/<project>/` as flat files, then cleans up. No `.git/` is retained. The cache is auto-gitignored.
+The fetch operation shallow-clones each remote to a temp directory, copies only the `.project-context/` files into `.deps-cache/<project>/` as flat files, then cleans up. No `.git/` is retained. The cache is auto-gitignored.
 
 ### Viewing Dependencies
 

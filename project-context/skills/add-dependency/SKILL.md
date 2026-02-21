@@ -1,6 +1,6 @@
 ---
 name: add-dependency
-description: "Use when users want to add, declare, or connect cross-project dependencies — local paths (monorepo) or git URLs (remote repos). Triggers: 'add dependency', 'depends on', 'consumed by', 'this project uses', 'connect projects', 'add upstream', 'add downstream', 'link projects', 'git dependency', 'remote dependency'."
+description: "Use when users want to add, declare, connect, fetch, or refresh cross-project dependencies — local paths (monorepo) or git URLs (remote repos). Triggers: 'add dependency', 'depends on', 'consumed by', 'this project uses', 'connect projects', 'add upstream', 'add downstream', 'link projects', 'git dependency', 'remote dependency', 'fetch deps', 'refresh deps', 'update deps', 'sync deps'."
 allowed-tools:
   - Read
   - Write
@@ -10,22 +10,20 @@ allowed-tools:
   - AskUserQuestion
 ---
 
-# Add Cross-Project Dependency
+# Cross-Project Dependency Management
 
-Add a dependency relationship to another project. Supports two modes:
-
-- **Local path** — sibling project in a monorepo (e.g., `../shared`)
-- **Git link** — remote repository by URL (e.g., `https://github.com/org/auth-service.git`)
-
-Creates `dependencies.json` if needed, appends to it if it exists. Local deps offer reciprocal updates; git link deps fetch the remote `.project-context/` into a local cache.
+Single command for all dependency operations: add new dependencies (local path or git URL), fetch/refresh cached git contexts, and clean stale caches.
 
 ## Parameter
 
-One optional parameter: a relative path OR a git URL.
+One optional parameter: a path, git URL, or action keyword.
 
 ```
 /project-context:add-dependency ../shared
 /project-context:add-dependency https://github.com/org/auth-service.git
+/project-context:add-dependency --fetch
+/project-context:add-dependency --fetch auth-service
+/project-context:add-dependency --clean
 /project-context:add-dependency              # no argument — interactive
 ```
 
@@ -42,24 +40,26 @@ If no `.project-context/` exists:
 
 Read `brief.md` if available to get the current project name.
 
-### 2. Determine Dependency Type
+### 2. Determine Intent
 
-**If argument was provided**, auto-detect:
-- Starts with `https://`, `git@`, `ssh://`, or ends with `.git` → **git link**
-- Otherwise → **local path**
+**If argument starts with `--fetch`:**  → Branch C (fetch/refresh git deps)
+**If argument starts with `--clean`:**  → Branch D (clean cache)
+**If argument is a git URL** (starts with `https://`, `git@`, `ssh://`, or ends with `.git`): → Branch B (add git link)
+**If argument is a path:** → Branch A (add local path)
 
 **If no argument was provided**, ask with AskUserQuestion:
-> "What kind of dependency?"
+> "What do you want to do?"
 
 Options:
-- **Local path (Recommended)** — "Sibling project in this monorepo"
-- **Git URL** — "Remote repository — only .project-context/ will be fetched"
+- **Add local dependency (Recommended)** — "Sibling project in this monorepo"
+- **Add git dependency** — "Remote repository — only .project-context/ will be fetched"
+- **Fetch/refresh git deps** — "Update cached contexts from remote repos"
 
 Then proceed to the matching branch below.
 
 ---
 
-## Branch A: Local Path Dependency
+## Branch A: Add Local Path Dependency
 
 ### A3. Resolve Target Project
 
@@ -120,7 +120,7 @@ Files modified:
 
 ---
 
-## Branch B: Git Link Dependency
+## Branch B: Add Git Link Dependency
 
 ### B3. Resolve Git URL
 
@@ -200,7 +200,69 @@ Files modified:
 
 ---
 
-## Shared Steps (Both Branches)
+## Branch C: Fetch / Refresh Git Dependencies
+
+Re-fetch cached context files for existing git link dependencies. Useful when the remote project has updated its `.project-context/`.
+
+### C3. Run fetch script
+
+**If a project name was provided after `--fetch`:** fetch only that one.
+
+```bash
+python project-context/scripts/fetch_git_deps.py fetch --dir . --project [name]
+```
+
+**If no project name:** fetch all git link dependencies.
+
+```bash
+python project-context/scripts/fetch_git_deps.py fetch --dir .
+```
+
+### C4. Report results
+
+Show fetch results from the script output:
+
+```
+Fetched git dependencies:
+  ✓ auth-service (3 files, ref: main)
+  ✓ shared-types (4 files, ref: v2.1.0)
+  ✗ payment-api — git clone failed: ...
+```
+
+If no git link dependencies exist in `dependencies.json`:
+> "No git link dependencies to fetch. Add one with `/project-context:add-dependency <git-url>`."
+
+---
+
+## Branch D: Clean Cache
+
+Remove cached git dependency contexts.
+
+### D3. Run clean
+
+**If a project name was provided after `--clean`:** clean only that project.
+
+```bash
+python project-context/scripts/fetch_git_deps.py clean --dir . --project [name]
+```
+
+**If no project name:** clean all cached deps.
+
+```bash
+python project-context/scripts/fetch_git_deps.py clean --dir .
+```
+
+### D4. Confirm
+
+```
+Cleaned cached contexts:
+  ✓ auth-service
+  ✓ shared-types
+```
+
+---
+
+## Shared Steps (Branches A and B)
 
 ### 5. Ask: Direction
 
@@ -275,7 +337,7 @@ For git links: if the URL matches `.git/config` remote URL, suggest using local 
 > "Path `[path]` doesn't exist. Check the path and try again."
 
 ### Network failure (git only)
-> "Failed to fetch from [url]. The entry was added to `dependencies.json` but context was not fetched. Run `/project-context:fetch-deps` to retry later."
+> "Failed to fetch from [url]. The entry was added to `dependencies.json` but context was not fetched. Run `/project-context:add-dependency --fetch` to retry later."
 
 ### No reciprocal for git links
 Git link dependencies do NOT offer reciprocal updates — you cannot write to a remote repository.
