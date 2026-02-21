@@ -33,7 +33,7 @@
     "cross-project",
     "git-link",
     "remote-dependency",
-    "sparse-checkout"
+    "shallow-clone"
   ],
   "commands": "./commands",
   "skills": "./skills"

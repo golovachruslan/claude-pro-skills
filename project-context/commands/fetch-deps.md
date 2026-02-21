@@ -33,6 +33,6 @@ If omitted, fetches all git link dependencies.
 
 Runs `fetch_git_deps.py fetch` to:
 1. Read `dependencies.json` for entries with a `git` field
-2. Sparse-checkout only `.project-context/` from each remote
-3. Cache results in `.project-context/.deps-cache/<project>/`
-4. Report fetch status for each dependency
+2. Shallow-clone each remote to a temp directory
+3. Copy only `.project-context/` files into `.deps-cache/<project>/` (flat — no `.git/`)
+4. Clean up temp clones and report fetch status

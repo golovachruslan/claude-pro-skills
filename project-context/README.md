@@ -271,7 +271,7 @@ The command auto-detects whether the argument is a local path or git URL. When c
 **Git link** dependencies:
 - Fetch only `.project-context/` from the remote repo (no application code)
 - Cache context in `.project-context/.deps-cache/<project>/`
-- Use `git sparse-checkout` for minimal downloads
+- Shallow clone to temp, copy context files, discard clone — no `.git/` overhead
 - Do not support reciprocal updates (cannot write to remote repos)
 
 ### Fetching / Refreshing Git Dependencies
@@ -284,7 +284,7 @@ The command auto-detects whether the argument is a local path or git URL. When c
 /project-context:fetch-deps auth-service
 ```
 
-The fetch command uses `git sparse-checkout` to download only the `.project-context/` directory from each remote, storing results in `.deps-cache/`. The cache is auto-gitignored.
+The fetch command shallow-clones each remote to a temp directory, copies only the `.project-context/` files into `.deps-cache/<project>/` as flat files, then cleans up. No `.git/` is retained. The cache is auto-gitignored.
 
 ### Viewing Dependencies
 
@@ -299,7 +299,7 @@ When working in a subproject:
 1. Read that subproject's `.project-context/` first
 2. Check `dependencies.json` for upstream/downstream relationships
 3. For local deps: pull in `brief.md` + `architecture.md` when touching integration boundaries
-4. For git link deps: read from `.deps-cache/<project>/.project-context/` instead
+4. For git link deps: read from `.deps-cache/<project>/` (flat files — brief.md, architecture.md, etc.)
 5. Never load a dependency's `state.md` or `progress.md` — that's their internal concern
 
 ## Architecture Documentation

@@ -178,7 +178,7 @@ After adding the entry, immediately fetch the remote `.project-context/`:
 python project-context/scripts/fetch_git_deps.py fetch --dir . --project [project-name]
 ```
 
-The script uses `git sparse-checkout` to clone only `.project-context/` into `.project-context/.deps-cache/[project-name]/`.
+The script shallow-clones to a temp dir, copies only the context files into `.project-context/.deps-cache/[project-name]/`, then cleans up the clone. No `.git/` is retained.
 
 ### B11. Confirmation
 
@@ -189,8 +189,10 @@ Added git dependency:
   Ref:  [ref]
   What: [what]
 
-Fetched remote context:
-  ✓ .project-context/.deps-cache/[project-name]/.project-context/
+Fetched remote context to .deps-cache/[project-name]/:
+  ✓ brief.md
+  ✓ architecture.md
+  ✓ ...
 
 Files modified:
   ✓ .project-context/dependencies.json

@@ -2,8 +2,9 @@
 """
 Fetch .project-context/ from git link dependencies.
 
-Uses git sparse-checkout to clone only the .project-context/ directory
-from remote repositories, storing results in .project-context/.deps-cache/.
+Clones remote repos to a temp directory (depth=1), copies only the context
+files into .project-context/.deps-cache/<project>/, then cleans up.
+No .git/ directories are retained — the cache is plain files.
 
 Usage:
     python fetch_git_deps.py fetch [--dir DIR] [--project NAME]
@@ -13,15 +14,16 @@ Usage:
 
 import argparse
 import json
-import os
 import shutil
 import subprocess
 import sys
+import tempfile
 from datetime import datetime
 from pathlib import Path
 
 
 CACHE_DIR_NAME = ".deps-cache"
+META_FILENAME = ".fetch-meta.json"
 
 
 def find_context_dir(start_dir="."):
@@ -85,8 +87,8 @@ def run_git(args, cwd=None, timeout=60):
 def fetch_single_dep(dep, cache_dir):
     """Fetch .project-context/ for a single git dependency.
 
-    Uses sparse-checkout to only clone the .project-context/ directory.
-    Returns a result dict with status and details.
+    Clones into a temp directory, copies context files to cache, cleans up.
+    No .git/ is retained — cache contains only plain context files.
     """
     project = dep["project"]
     git_url = dep["git"]
@@ -100,152 +102,66 @@ def fetch_single_dep(dep, cache_dir):
         "direction": dep["direction"],
     }
 
-    if dep_cache.exists():
-        # Update existing cache — pull latest
-        return _update_cached_dep(dep_cache, ref, result)
-    else:
-        # Fresh clone with sparse checkout
-        return _clone_dep(dep_cache, git_url, ref, result)
+    # Clone to temp dir, copy context files out, delete clone
+    tmp_dir = None
+    try:
+        tmp_dir = Path(tempfile.mkdtemp(prefix=f"deps-{project}-"))
 
+        # Shallow clone
+        clone_args = ["clone", "--depth", "1"]
+        if ref != "HEAD":
+            clone_args += ["--branch", ref]
+        clone_args += [git_url, str(tmp_dir / "repo")]
 
-def _clone_dep(dep_cache, git_url, ref, result):
-    """Clone a new git dependency with sparse checkout."""
-    dep_cache.mkdir(parents=True, exist_ok=True)
-
-    # Initialize empty repo
-    ok, _, err = run_git(["init"], cwd=dep_cache)
-    if not ok:
-        result["status"] = "error"
-        result["error"] = f"git init failed: {err}"
-        shutil.rmtree(dep_cache, ignore_errors=True)
-        return result
-
-    # Add remote
-    ok, _, err = run_git(["remote", "add", "origin", git_url], cwd=dep_cache)
-    if not ok:
-        result["status"] = "error"
-        result["error"] = f"git remote add failed: {err}"
-        shutil.rmtree(dep_cache, ignore_errors=True)
-        return result
-
-    # Configure sparse checkout
-    ok, _, err = run_git(["sparse-checkout", "init", "--cone"], cwd=dep_cache)
-    if not ok:
-        result["status"] = "error"
-        result["error"] = f"sparse-checkout init failed: {err}"
-        shutil.rmtree(dep_cache, ignore_errors=True)
-        return result
-
-    ok, _, err = run_git(["sparse-checkout", "set", ".project-context"], cwd=dep_cache)
-    if not ok:
-        result["status"] = "error"
-        result["error"] = f"sparse-checkout set failed: {err}"
-        shutil.rmtree(dep_cache, ignore_errors=True)
-        return result
-
-    # Fetch with depth=1 (only latest commit)
-    fetch_ref = ref if ref != "HEAD" else ""
-    fetch_args = ["fetch", "--depth", "1", "origin"]
-    if fetch_ref:
-        fetch_args.append(fetch_ref)
-
-    ok, _, err = run_git(fetch_args, cwd=dep_cache, timeout=120)
-    if not ok:
-        result["status"] = "error"
-        result["error"] = f"git fetch failed: {err}"
-        shutil.rmtree(dep_cache, ignore_errors=True)
-        return result
-
-    # Checkout
-    checkout_target = "FETCH_HEAD" if not fetch_ref else f"origin/{fetch_ref}"
-    ok, _, err = run_git(["checkout", "FETCH_HEAD"], cwd=dep_cache)
-    if not ok:
-        # Try FETCH_HEAD directly
-        ok, _, err = run_git(["checkout", "FETCH_HEAD"], cwd=dep_cache)
+        ok, _, err = run_git(clone_args, timeout=120)
         if not ok:
             result["status"] = "error"
-            result["error"] = f"git checkout failed: {err}"
-            shutil.rmtree(dep_cache, ignore_errors=True)
+            result["error"] = f"git clone failed: {err}"
             return result
 
-    # Verify .project-context/ was fetched
-    context_in_cache = dep_cache / ".project-context"
-    if not context_in_cache.is_dir():
-        result["status"] = "no_context"
-        result["message"] = "Remote repository has no .project-context/ directory"
-        # Keep the cache dir for future retries but mark it
-        (dep_cache / ".no-context").write_text(
-            f"No .project-context/ found at {git_url} ref={ref} on {datetime.now().isoformat()}\n"
-        )
-        return result
+        # Check if .project-context/ exists in cloned repo
+        cloned_context = tmp_dir / "repo" / ".project-context"
+        if not cloned_context.is_dir():
+            result["status"] = "no_context"
+            result["message"] = "Remote repository has no .project-context/ directory"
+            return result
 
-    # Catalog fetched files
-    context_files = [f.name for f in context_in_cache.iterdir() if f.is_file()]
-    result["status"] = "ok"
-    result["cached_path"] = str(context_in_cache)
-    result["files"] = context_files
-    result["fetched_at"] = datetime.now().isoformat()
+        # Collect context files (only files, skip subdirs like plans/)
+        context_files = [f.name for f in cloned_context.iterdir() if f.is_file()]
+        if not context_files:
+            result["status"] = "no_context"
+            result["message"] = ".project-context/ exists but contains no files"
+            return result
 
-    # Write metadata
-    meta = dep_cache / ".fetch-meta.json"
-    meta.write_text(json.dumps({
-        "project": result["project"],
-        "git": result["git"],
-        "ref": result["ref"],
-        "fetched_at": result["fetched_at"],
-        "files": context_files,
-    }, indent=2))
+        # Clear old cache and copy fresh files
+        if dep_cache.exists():
+            shutil.rmtree(dep_cache)
+        dep_cache.mkdir(parents=True)
 
-    return result
+        for f in cloned_context.iterdir():
+            if f.is_file():
+                shutil.copy2(f, dep_cache / f.name)
 
+        # Write fetch metadata
+        fetched_at = datetime.now().isoformat()
+        meta = {
+            "project": project,
+            "git": git_url,
+            "ref": ref,
+            "fetched_at": fetched_at,
+            "files": context_files,
+        }
+        (dep_cache / META_FILENAME).write_text(json.dumps(meta, indent=2))
 
-def _update_cached_dep(dep_cache, ref, result):
-    """Update an existing cached dependency by pulling latest."""
-    # Check if this was a previously failed fetch
-    no_context_marker = dep_cache / ".no-context"
-    if no_context_marker.exists():
-        # Clean and re-clone
-        shutil.rmtree(dep_cache, ignore_errors=True)
-        return _clone_dep(dep_cache, result["git"], ref, result)
+        result["status"] = "ok"
+        result["cached_path"] = str(dep_cache)
+        result["files"] = context_files
+        result["fetched_at"] = fetched_at
 
-    fetch_args = ["fetch", "--depth", "1", "origin"]
-    if ref != "HEAD":
-        fetch_args.append(ref)
-
-    ok, _, err = run_git(fetch_args, cwd=dep_cache, timeout=120)
-    if not ok:
-        result["status"] = "error"
-        result["error"] = f"git fetch failed: {err}"
-        return result
-
-    ok, _, err = run_git(["checkout", "FETCH_HEAD"], cwd=dep_cache)
-    if not ok:
-        result["status"] = "error"
-        result["error"] = f"git checkout failed: {err}"
-        return result
-
-    context_in_cache = dep_cache / ".project-context"
-    if not context_in_cache.is_dir():
-        result["status"] = "no_context"
-        result["message"] = "Remote repository has no .project-context/ directory"
-        return result
-
-    context_files = [f.name for f in context_in_cache.iterdir() if f.is_file()]
-    result["status"] = "ok"
-    result["cached_path"] = str(context_in_cache)
-    result["files"] = context_files
-    result["fetched_at"] = datetime.now().isoformat()
-    result["updated"] = True
-
-    # Update metadata
-    meta = dep_cache / ".fetch-meta.json"
-    meta.write_text(json.dumps({
-        "project": result["project"],
-        "git": result["git"],
-        "ref": result["ref"],
-        "fetched_at": result["fetched_at"],
-        "files": context_files,
-    }, indent=2))
+    finally:
+        # Always clean up temp dir
+        if tmp_dir and tmp_dir.exists():
+            shutil.rmtree(tmp_dir, ignore_errors=True)
 
     return result
 
@@ -324,7 +240,7 @@ def cmd_status(args):
         if not item.is_dir() or item.name.startswith("."):
             continue
 
-        meta_file = item / ".fetch-meta.json"
+        meta_file = item / META_FILENAME
         entry = {"project": item.name, "cache_path": str(item)}
 
         if meta_file.exists():
@@ -337,11 +253,10 @@ def cmd_status(args):
         # Check if still declared in dependencies.json
         entry["declared"] = item.name in git_dep_map
 
-        # Check if .project-context/ exists in cache
-        ctx = item / ".project-context"
-        entry["has_context"] = ctx.is_dir()
-        if ctx.is_dir():
-            entry["context_files"] = [f.name for f in ctx.iterdir() if f.is_file()]
+        # List cached context files (excluding metadata)
+        context_files = [f.name for f in item.iterdir() if f.is_file() and f.name != META_FILENAME]
+        entry["has_context"] = len(context_files) > 0
+        entry["context_files"] = context_files
 
         cached.append(entry)
 

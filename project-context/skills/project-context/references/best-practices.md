@@ -91,7 +91,7 @@ When working in a subproject:
 1. Read that subproject's `.project-context/` first
 2. Check `dependencies.json` for upstream/downstream relationships
 3. For local deps: pull in `brief.md` + `architecture.md` when touching integration boundaries
-4. For git link deps: read from `.deps-cache/<project>/.project-context/` instead
+4. For git link deps: read from `.deps-cache/<project>/` (flat files — brief.md, architecture.md, etc.)
 5. Never load a dependency's `state.md` or `progress.md` — that's their internal concern
 
 ### Monorepo Initialization

@@ -163,7 +163,7 @@ def cmd_status(args):
         if git_deps:
             # Check cache status for git deps
             cache_dir = context_dir / ".deps-cache"
-            cached = [d["project"] for d in git_deps if (cache_dir / d["project"] / ".project-context").is_dir()]
+            cached = [d["project"] for d in git_deps if (cache_dir / d["project"]).is_dir()]
             result["dependencies"]["git_cached"] = cached
             result["dependencies"]["git_not_cached"] = [d["project"] for d in git_deps if d["project"] not in cached]
 
@@ -290,7 +290,7 @@ def cmd_validate(args):
                     })
 
                 # Check if cached context exists
-                cache_path = context_dir / ".deps-cache" / dep["project"] / ".project-context"
+                cache_path = context_dir / ".deps-cache" / dep["project"]
                 if not cache_path.is_dir():
                     issues.append({
                         "file": "dependencies.json",
@@ -391,15 +391,17 @@ def cmd_deps(args):
     for dep_list_key in ("upstream", "downstream"):
         for dep in deps[dep_list_key]:
             if "git" in dep:
-                # Git link dependency — check cache
+                # Git link dependency — check flat cache
                 cache_path = context_dir / ".deps-cache" / dep["project"]
-                cached_context = cache_path / ".project-context"
                 dep["type"] = "git"
-                dep["cached"] = cached_context.is_dir()
+                dep["cached"] = cache_path.is_dir()
                 dep["cache_path"] = str(cache_path) if cache_path.is_dir() else None
-                dep["has_context"] = cached_context.is_dir()
-                if cached_context.is_dir():
-                    dep["context_files"] = [f.name for f in cached_context.iterdir() if f.is_file()]
+                dep["has_context"] = cache_path.is_dir()
+                if cache_path.is_dir():
+                    dep["context_files"] = [
+                        f.name for f in cache_path.iterdir()
+                        if f.is_file() and f.name != ".fetch-meta.json"
+                    ]
             else:
                 # Local path dependency
                 dep_abs = (context_dir.parent / dep["path"]).resolve()
