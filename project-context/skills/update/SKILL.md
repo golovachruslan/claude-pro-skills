@@ -189,6 +189,186 @@ Updates applied to .project-context files:
 Configuration files refreshed: CLAUDE.md, AGENTS.md
 ```
 
+---
+
+## Step 5: Propagate to Downstream Dependencies
+
+After applying updates, check if any downstream local-path dependencies exist and if changes are relevant to them.
+
+### 5a. Check for Downstream Deps
+
+Read `.project-context/dependencies.json` (if it exists):
+
+```bash
+cat .project-context/dependencies.json 2>/dev/null
+```
+
+If no `downstream` entries exist, or all downstream entries are git URLs (have a `git` field) → skip this step entirely.
+
+Only local-path downstream deps (entries with a `path` field) are eligible for propagation.
+
+### 5b. Determine What Changed
+
+Compare the files that were just updated against each downstream dep's `what` field to assess relevance.
+
+**Relevance mapping:**
+
+| Changed file | Relevant if `what` mentions |
+|---|---|
+| `architecture.md` | API, endpoints, schema, interface, contract, integration, architecture, structure |
+| `brief.md` | requirements, goals, scope, vision, purpose |
+| `patterns.md` | patterns, conventions, standards, practices |
+| `progress.md` | *(rarely relevant to downstream — skip unless `what` mentions milestones)* |
+| `state.md` | *(rarely relevant — skip)* |
+
+If no changed files are relevant to any downstream dep's `what` field → skip propagation silently.
+
+### 5c. Ask User Confirmation
+
+Present only the downstream deps with relevant changes:
+
+```
+Your context changes may affect downstream projects:
+
+  📦 web — consumes: API types, REST endpoints
+     Relevant changes: architecture.md (new /users/bulk endpoint)
+
+  📦 mobile — consumes: API types, push notification schemas
+     Relevant changes: architecture.md (new /users/bulk endpoint), brief.md (scope change)
+
+Propagate upstream changes to these projects?
+```
+
+Use AskUserQuestion with options:
+- **Yes, all** — propagate to all listed projects
+- **Pick** — ask per-project (Yes/No for each)
+- **Skip** — do not propagate
+
+### 5d. Build Propagation Entry
+
+For each confirmed downstream project, compose a concise entry summarizing what changed and what action may be needed:
+
+```markdown
+## Upstream Changes (from: {current-project-name}, {YYYY-MM-DD})
+
+- **{changed-file}**: {brief description of what changed}
+- **Action needed**: {what the downstream project may need to update}
+```
+
+Infer the current project name from `.project-context/brief.md` (`**Project Name:**` field) or fall back to the current directory name.
+
+### 5e. Append to Downstream state.md
+
+For each confirmed downstream project:
+
+1. Check the target path exists:
+   ```bash
+   ls {dep-path}/.project-context/state.md 2>/dev/null
+   ```
+   If `state.md` does not exist → skip with a warning: `"{dep-path} has no state.md — skipping propagation"`
+
+2. Read the current `state.md`
+
+3. Check if an `## Upstream Changes` section already exists:
+   - If yes → append new entry below the existing ones (keep history)
+   - If no → append a new `## Upstream Changes` section at the end of the file
+
+4. Use Edit tool to apply the change.
+
+---
+
+## Step 6: Commit Changes
+
+After all context updates and propagations are applied, offer to commit.
+
+### 6a. Detect Git Roots
+
+```bash
+# Your project's git root
+git rev-parse --show-toplevel
+
+# Each downstream dep's git root (for propagated deps only)
+git -C {dep-path} rev-parse --show-toplevel 2>/dev/null
+```
+
+Group downstream deps by whether their git root matches yours:
+- **Same root** → can be included in one commit with your changes
+- **Different root** → requires a separate branch + commit in their repo
+
+### 6b. Ask Commit Confirmation
+
+Present a summary of what will be committed:
+
+```
+Commit context changes?
+
+  This repo:
+    .project-context/architecture.md
+    .project-context/progress.md
+    ../web/.project-context/state.md   ← same git root
+
+  ../mobile/ (separate repo):
+    .project-context/state.md          ← will create branch context/upstream-{name}-{date}
+```
+
+Use AskUserQuestion:
+- **Yes** — commit all
+- **Skip** — leave files modified, do not commit
+
+If user skips → show summary of modified files and exit.
+
+### 6c. Commit Same-Root Changes
+
+Stage and commit all same-root files together:
+
+```bash
+git add .project-context/ {same-root-dep-paths...}
+git commit -m "chore(context): update {project-name} context + propagate to {dep-names}"
+```
+
+### 6d. Commit Different-Root Deps
+
+For each separate-repo downstream dep that was propagated to:
+
+```bash
+# Determine branch name
+BRANCH="context/upstream-{current-project-name}-{YYYY-MM-DD}"
+
+# Check if branch already exists
+git -C {dep-path} branch --list {BRANCH}
+# If exists → reuse it (checkout, amend or add new commit)
+# If not → create it
+
+git -C {dep-path} checkout -b {BRANCH}   # or: checkout {BRANCH} if already exists
+git -C {dep-path} add .project-context/state.md
+git -C {dep-path} commit -m "chore(context): upstream changes from {current-project-name} ({YYYY-MM-DD})"
+git -C {dep-path} checkout -   # return to their previous branch
+```
+
+If the downstream repo has a conflict on checkout (rare — only if state.md has staged/conflicting changes):
+```
+Could not create branch in ../mobile — working tree has conflicts on .project-context/state.md.
+File was modified but not committed. Please commit or stash changes in ../mobile first.
+```
+
+### 6e. Final Summary
+
+```markdown
+## Done
+
+Context updates applied:
+  ✓ .project-context/architecture.md
+  ✓ .project-context/progress.md
+
+Propagated to:
+  ✓ web — state.md updated
+  ✓ mobile — state.md updated
+
+Commits:
+  ✓ This repo — "chore(context): update api context + propagate to web"
+  ✓ ../mobile — branch context/upstream-api-2026-02-21 created
+```
+
 ## Quality Filters
 
 Only capture insights that are:
