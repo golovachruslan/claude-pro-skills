@@ -149,12 +149,23 @@ def cmd_status(args):
     }
 
     if deps:
+        all_deps = deps["upstream"] + deps["downstream"]
+        git_deps = [d for d in all_deps if "git" in d]
+        local_deps = [d for d in all_deps if "git" not in d]
         result["dependencies"] = {
             "upstream_count": len(deps["upstream"]),
             "downstream_count": len(deps["downstream"]),
             "upstream": [d["project"] for d in deps["upstream"]],
             "downstream": [d["project"] for d in deps["downstream"]],
+            "git_link_count": len(git_deps),
+            "local_count": len(local_deps),
         }
+        if git_deps:
+            # Check cache status for git deps
+            cache_dir = context_dir / ".deps-cache"
+            cached = [d["project"] for d in git_deps if (cache_dir / d["project"]).is_dir()]
+            result["dependencies"]["git_cached"] = cached
+            result["dependencies"]["git_not_cached"] = [d["project"] for d in git_deps if d["project"] not in cached]
 
     print(json.dumps(result, indent=2))
     return 0
@@ -256,28 +267,61 @@ def cmd_validate(args):
             if "```mermaid" not in content:
                 issues.append({"file": fname, "severity": "warning", "message": "architecture.md has no Mermaid diagrams"})
 
-    # Validate dependencies.md paths if present
+    # Validate dependency entries if present
     deps = parse_dependencies(context_dir)
     if deps:
         project_root = Path(args.dir).resolve()
         all_deps = deps["upstream"] + deps["downstream"]
         for dep in all_deps:
-            dep_path = (context_dir.parent / dep["path"]).resolve()
-            if not dep_path.is_dir():
-                issues.append({
-                    "file": "dependencies.json",
-                    "severity": "warning",
-                    "message": f"Dependency '{dep['project']}' path not found: {dep['path']}"
-                })
-            else:
-                # Check if the dependency target also has a .project-context/
-                dep_context = dep_path / ".project-context"
-                if not dep_context.is_dir():
+            if "git" in dep:
+                # Git link dependency — validate git URL and cache status
+                git_url = dep["git"]
+                if not git_url:
+                    issues.append({
+                        "file": "dependencies.json",
+                        "severity": "error",
+                        "message": f"Git dependency '{dep['project']}' has empty git URL"
+                    })
+                elif not any(git_url.startswith(p) for p in ("https://", "git@", "ssh://")) and not git_url.endswith(".git"):
+                    issues.append({
+                        "file": "dependencies.json",
+                        "severity": "warning",
+                        "message": f"Git dependency '{dep['project']}' URL may be invalid: {git_url}"
+                    })
+
+                # Check if cached context exists
+                cache_path = context_dir / ".deps-cache" / dep["project"]
+                if not cache_path.is_dir():
                     issues.append({
                         "file": "dependencies.json",
                         "severity": "info",
-                        "message": f"Dependency '{dep['project']}' at {dep['path']} has no .project-context/ — consider initializing it"
+                        "message": f"Git dependency '{dep['project']}' context not cached — run /project-context:add-dependency --fetch"
                     })
+            elif "path" in dep:
+                # Local path dependency — validate path exists
+                dep_path = (context_dir.parent / dep["path"]).resolve()
+                if not dep_path.is_dir():
+                    issues.append({
+                        "file": "dependencies.json",
+                        "severity": "warning",
+                        "message": f"Dependency '{dep['project']}' path not found: {dep['path']}"
+                    })
+                else:
+                    # Check if the dependency target also has a .project-context/
+                    dep_context = dep_path / ".project-context"
+                    if not dep_context.is_dir():
+                        issues.append({
+                            "file": "dependencies.json",
+                            "severity": "info",
+                            "message": f"Dependency '{dep['project']}' at {dep['path']} has no .project-context/ — consider initializing it"
+                        })
+            else:
+                # Missing both git and path
+                issues.append({
+                    "file": "dependencies.json",
+                    "severity": "error",
+                    "message": f"Dependency '{dep['project']}' has neither 'path' nor 'git' field"
+                })
 
     # Check plans directory
     plans_dir = context_dir / "plans"
@@ -346,14 +390,32 @@ def cmd_deps(args):
     # Resolve paths and check if dependency contexts exist
     for dep_list_key in ("upstream", "downstream"):
         for dep in deps[dep_list_key]:
-            dep_abs = (context_dir.parent / dep["path"]).resolve()
-            dep["resolved_path"] = str(dep_abs)
-            dep["exists"] = dep_abs.is_dir()
-            dep["has_context"] = (dep_abs / ".project-context").is_dir()
+            if "git" in dep:
+                # Git link dependency — check flat cache
+                cache_path = context_dir / ".deps-cache" / dep["project"]
+                dep["type"] = "git"
+                dep["cached"] = cache_path.is_dir()
+                dep["cache_path"] = str(cache_path) if cache_path.is_dir() else None
+                dep["has_context"] = cache_path.is_dir()
+                if cache_path.is_dir():
+                    dep["context_files"] = [
+                        f.name for f in cache_path.iterdir()
+                        if f.is_file() and f.name != ".fetch-meta.json"
+                    ]
+            else:
+                # Local path dependency
+                dep_abs = (context_dir.parent / dep["path"]).resolve()
+                dep["type"] = "local"
+                dep["resolved_path"] = str(dep_abs)
+                dep["exists"] = dep_abs.is_dir()
+                dep["has_context"] = (dep_abs / ".project-context").is_dir()
 
     result = {
         "project_dir": str(Path(args.dir).resolve()),
         "has_dependencies": True,
+        "git_deps_count": sum(
+            1 for d in deps["upstream"] + deps["downstream"] if "git" in d
+        ),
         **deps,
     }
 

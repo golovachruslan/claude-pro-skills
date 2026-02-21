@@ -1,7 +1,7 @@
 ---
 name: project-context:add-dependency
-description: Add a cross-project dependency to the current subproject's dependencies.md in a monorepo
-argument-hint: "<project-path>"
+description: Add, fetch, or refresh cross-project dependencies — local paths or git URLs
+argument-hint: "<path-or-git-url | --fetch [name] | --clean [name]>"
 allowed-tools:
   - Read
   - Write
@@ -11,28 +11,43 @@ allowed-tools:
   - AskUserQuestion
 ---
 
-# Add Cross-Project Dependency
+# Cross-Project Dependency Management
 
-Add a dependency to the current subproject's `dependencies.json`.
+Single command for all dependency operations.
 
 ## Parameter
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| `<project-path>` | No | Relative path to target project (e.g., `../shared`) |
+| `<path>` | No | Relative path to local sibling project |
+| `<git-url>` | No | Git repository URL (HTTPS or SSH) |
+| `--fetch [name]` | No | Fetch/refresh git dep caches (all or specific) |
+| `--clean [name]` | No | Clean cached git dep contexts (all or specific) |
 
-If omitted, discovers sibling projects and presents them as choices.
+If omitted, asks interactively whether to add or fetch.
 
 ## Examples
 
 ```bash
-# With path — asks direction/what/notes interactively
+# Add local dependency
 /project-context:add-dependency ../shared
 
-# Fully interactive
+# Add git dependency (auto-fetches context)
+/project-context:add-dependency https://github.com/org/auth-service.git
+
+# Refresh all cached git deps
+/project-context:add-dependency --fetch
+
+# Refresh a specific git dep
+/project-context:add-dependency --fetch auth-service
+
+# Clean all cached contexts
+/project-context:add-dependency --clean
+
+# Interactive mode
 /project-context:add-dependency
 ```
 
 ## Workflow
 
-Invoke the `add-dependency` skill — it resolves the path, then uses AskUserQuestion to gather direction, what's shared, and notes.
+Invoke the `add-dependency` skill — it auto-detects intent from the argument (path, git URL, `--fetch`, or `--clean`), then proceeds accordingly.

@@ -196,7 +196,30 @@ monorepo/
 
 ### dependencies.json Format
 
-Each subproject declares its upstream (consumes) and downstream (consumed by) relationships:
+Each subproject declares its upstream (consumes) and downstream (consumed by) relationships. Two dependency types are supported:
+
+**Local path dependency** (monorepo siblings):
+```json
+{
+  "project": "shared",
+  "path": "../shared",
+  "what": "Types, validation utilities",
+  "note": "Core domain types"
+}
+```
+
+**Git link dependency** (remote repositories):
+```json
+{
+  "project": "auth-service",
+  "git": "https://github.com/org/auth-service.git",
+  "ref": "main",
+  "what": "Auth API types, JWT schemas",
+  "note": "External auth service"
+}
+```
+
+Both types can coexist in the same `dependencies.json`:
 
 ```json
 {
@@ -206,6 +229,13 @@ Each subproject declares its upstream (consumes) and downstream (consumed by) re
       "path": "../shared",
       "what": "Types, validation utilities",
       "note": "Core domain types"
+    },
+    {
+      "project": "auth-service",
+      "git": "https://github.com/org/auth-service.git",
+      "ref": "main",
+      "what": "Auth API types, JWT schemas",
+      "note": "External auth service"
     }
   ],
   "downstream": [
@@ -222,18 +252,39 @@ Each subproject declares its upstream (consumes) and downstream (consumed by) re
 ### Adding Dependencies
 
 ```bash
-# Interactive — discovers siblings, prompts for direction/target, updates both sides
+# Local path — discovers siblings, prompts for direction/target, updates both sides
 /project-context:add-dependency
-
-# With path — skips project discovery, asks the rest interactively
 /project-context:add-dependency ../shared
+
+# Git URL — asks ref/name/direction/what/notes interactively, fetches remote context
+/project-context:add-dependency https://github.com/org/auth-service.git
 ```
 
-The command handles:
-- Discovering sibling projects with `.project-context/`
-- Prompting for direction (upstream/downstream), target, and what's shared
-- Creating `dependencies.json` if it doesn't exist
-- Offering reciprocal updates to the target project
+The command auto-detects whether the argument is a local path or git URL. When called without arguments, it asks which type to add.
+
+**Local path** dependencies:
+- Discover sibling projects with `.project-context/`
+- Prompt for direction (upstream/downstream), target, and what's shared
+- Create `dependencies.json` if it doesn't exist
+- Offer reciprocal updates to the target project
+
+**Git link** dependencies:
+- Fetch only `.project-context/` from the remote repo (no application code)
+- Cache context in `.project-context/.deps-cache/<project>/`
+- Shallow clone to temp, copy context files, discard clone — no `.git/` overhead
+- Do not support reciprocal updates (cannot write to remote repos)
+
+### Fetching / Refreshing Git Dependencies
+
+```bash
+# Refresh all cached git deps
+/project-context:add-dependency --fetch
+
+# Refresh a specific dependency
+/project-context:add-dependency --fetch auth-service
+```
+
+The fetch operation shallow-clones each remote to a temp directory, copies only the `.project-context/` files into `.deps-cache/<project>/` as flat files, then cleans up. No `.git/` is retained. The cache is auto-gitignored.
 
 ### Viewing Dependencies
 
@@ -247,8 +298,9 @@ python manage_context.py deps --dir packages/api
 When working in a subproject:
 1. Read that subproject's `.project-context/` first
 2. Check `dependencies.json` for upstream/downstream relationships
-3. When touching integration boundaries, pull in the dependency's `brief.md` + `architecture.md`
-4. Never load a dependency's `state.md` or `progress.md` — that's their internal concern
+3. For local deps: pull in `brief.md` + `architecture.md` when touching integration boundaries
+4. For git link deps: read from `.deps-cache/<project>/` (flat files — brief.md, architecture.md, etc.)
+5. Never load a dependency's `state.md` or `progress.md` — that's their internal concern
 
 ## Architecture Documentation
 
@@ -356,9 +408,10 @@ Keep this managed block so project-context commands can refresh the instructions
 ├── state.md           # Current position, blockers, next action
 ├── progress.md        # Completed/in-progress/upcoming work
 ├── patterns.md        # Established patterns and learnings
-├── dependencies.json  # Cross-project dependencies (optional, monorepo)
+├── dependencies.json  # Cross-project dependencies (optional)
 ├── continue.md        # Session handoff (created by /pause)
-└── plans/             # Saved implementation plans
+├── plans/             # Saved implementation plans
+└── .deps-cache/       # Cached git link dependency contexts (auto-gitignored)
 ```
 
 ## Comparison with Cline Memory Bank
