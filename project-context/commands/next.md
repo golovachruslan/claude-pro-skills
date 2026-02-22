@@ -41,7 +41,7 @@ state.md is stale (>1 day)?         → "Run /project-context:update to refresh 
 Plan exists with Status: Planning?  → "Plan '[name]' is ready. Run /project-context:implement [path]"
 Plan exists, partially done?        → "Resume implementation. Run /project-context:implement [path]"
 Multiple stale files?               → "Context is stale. Run /project-context:update --scan"
-Context is fresh, no active plans?  → "Ready for new work. Run /project-context:discuss to brainstorm"
+Context is fresh, no active plans?  → "Ready for new work. Run /project-context:brainstorm to brainstorm"
 ```
 
 ### Step 3: Read State File for Context
@@ -66,7 +66,7 @@ If `.project-context/state.md` exists, read it for additional routing info:
 [Reason why this is the right next step]
 
 ## Other Options
-- /project-context:discuss — Start brainstorming a new feature
+- /project-context:brainstorm — Start brainstorming a new feature
 - /project-context:plan — Create a plan (if decisions are locked)
 - /project-context:update — Refresh context files or extract learnings
 - /project-context:pause — Save session state for later

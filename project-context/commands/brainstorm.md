@@ -1,5 +1,5 @@
 ---
-name: project-context:discuss
+name: project-context:brainstorm
 description: Brainstorm and resolve gray areas before planning. Captures locked decisions that constrain the planner.
 allowed-tools:
   - AskUserQuestion
@@ -12,7 +12,7 @@ allowed-tools:
 
 # Discuss & Brainstorm
 
-Use the `project-context:discuss` skill to brainstorm requirements and resolve ambiguities BEFORE planning.
+Use the `project-context:brainstorm` skill to brainstorm requirements and resolve ambiguities BEFORE planning.
 
 ## Task Tool Usage
 

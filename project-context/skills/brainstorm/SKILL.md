@@ -1,5 +1,5 @@
 ---
-name: discuss
+name: brainstorm
 description: "Use when users want to brainstorm, discuss requirements, or explore ideas BEFORE planning. Triggers: 'let's discuss', 'brainstorm', 'think through', 'what should we consider', 'before we plan'. Captures decisions as locked constraints that flow into planning."
 allowed-tools:
   - AskUserQuestion

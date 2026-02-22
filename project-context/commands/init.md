@@ -110,7 +110,7 @@ graph TB
 - None
 
 ## Next Action
-Run /project-context:discuss to brainstorm first feature
+Run /project-context:brainstorm to brainstorm first feature
 
 ---
 *Last updated: [current date]*
@@ -172,4 +172,4 @@ If the script is not available, manually check for and add managed sections usin
 Display summary:
 - List created files (5 files + plans directory)
 - Show any updates to CLAUDE.md/AGENTS.md
-- Suggest next steps: "Run `/project-context:discuss` to brainstorm your first feature"
+- Suggest next steps: "Run `/project-context:brainstorm` to brainstorm your first feature"
