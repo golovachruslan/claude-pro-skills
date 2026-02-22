@@ -33,7 +33,7 @@ Use these as starting points. Remove irrelevant sections, add domain-specific on
 
 ## Decisions
 
-Locked decisions from brainstorming (from /project-context:discuss):
+Locked decisions from brainstorming (from /project-context:brainstorm):
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|

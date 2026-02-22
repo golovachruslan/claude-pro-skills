@@ -1,6 +1,6 @@
 ---
 name: planner
-description: "Use when users request feature planning, project planning, or implementation planning. Triggers: 'plan this feature', 'help me plan', 'how should I implement'. Creates structured executable plans from locked decisions. Run /project-context:discuss first to brainstorm."
+description: "Use when users request feature planning, project planning, or implementation planning. Triggers: 'plan this feature', 'help me plan', 'how should I implement'. Creates structured executable plans from locked decisions. Run /project-context:brainstorm first to brainstorm."
 allowed-tools:
   - AskUserQuestion
   - Read
@@ -33,7 +33,7 @@ Create structured, executable implementation plans. **Plans should flow from loc
 1. **Ask, don't assume** — Use AskUserQuestion when information is missing
 2. **Plans are executable prompts** — Every task must have: Files, Action, Verify, Done
 3. **Context-first** — Always read project context before planning
-4. **Decisions before details** — Check for locked decisions from /project-context:discuss
+4. **Decisions before details** — Check for locked decisions from /project-context:brainstorm
 5. **Leverage native features** — Use Plan Mode for research, native Tasks for tracking
 
 ## Planning Workflow
@@ -59,7 +59,7 @@ Use context to ask **informed** questions (reference specific tech, patterns, de
 
 ### 2. Check for Locked Decisions
 
-Look for decisions from a prior `/project-context:discuss` session:
+Look for decisions from a prior `/project-context:brainstorm` session:
 - In conversation history
 - In plan files with a "Decisions" section
 - In `state.md` referencing a discuss session
