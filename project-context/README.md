@@ -203,6 +203,7 @@ Each subproject declares its upstream (consumes) and downstream (consumed by) re
 {
   "project": "shared",
   "path": "../shared",
+  "description": "Shared library providing domain types, validation logic, and common utilities",
   "what": "Types, validation utilities",
   "note": "Core domain types"
 }
@@ -214,10 +215,13 @@ Each subproject declares its upstream (consumes) and downstream (consumed by) re
   "project": "auth-service",
   "git": "https://github.com/org/auth-service.git",
   "ref": "main",
+  "description": "Authentication microservice handling OAuth2 and JWT token lifecycle",
   "what": "Auth API types, JWT schemas",
   "note": "External auth service"
 }
 ```
+
+The `description` field is auto-computed by the agent from the dependency's `brief.md` when you run `/project-context:add-dependency`. It gives the AI instant understanding of what the project IS (vs `what`, which describes what's shared at the boundary) — without needing to load the dep's context files.
 
 Both types can coexist in the same `dependencies.json`:
 
@@ -227,6 +231,7 @@ Both types can coexist in the same `dependencies.json`:
     {
       "project": "shared",
       "path": "../shared",
+      "description": "Shared library providing domain types, validation logic, and common utilities",
       "what": "Types, validation utilities",
       "note": "Core domain types"
     },
@@ -234,6 +239,7 @@ Both types can coexist in the same `dependencies.json`:
       "project": "auth-service",
       "git": "https://github.com/org/auth-service.git",
       "ref": "main",
+      "description": "Authentication microservice handling OAuth2 and JWT token lifecycle",
       "what": "Auth API types, JWT schemas",
       "note": "External auth service"
     }

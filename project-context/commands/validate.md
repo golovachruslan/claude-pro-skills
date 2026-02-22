@@ -28,6 +28,28 @@ ls -la .project-context/*.md 2>/dev/null
 
 Report any missing files.
 
+### Step 1b: Check Dependencies (if present)
+
+If `.project-context/dependencies.json` exists:
+
+```bash
+cat .project-context/dependencies.json
+```
+
+Validate:
+- Valid JSON with `upstream` and `downstream` arrays
+- Each entry has `project`, `what`, and either `path` or `git` (never both)
+- If `description` is present, it must be a non-empty string
+- For local path deps: path exists and target directory has `.project-context/`
+- For git link deps: `.project-context/.deps-cache/<project>/` exists
+- No orphaned cache entries (directories in `.deps-cache/` not declared in `dependencies.json`)
+
+Check git dep cache freshness:
+```bash
+cat .project-context/.deps-cache/*/.fetch-meta.json 2>/dev/null
+```
+Warn if any `fetched_at` timestamp is >7 days old.
+
 ### Step 2: Check File Content
 
 For each file, verify:
@@ -114,6 +136,14 @@ Output a validation report:
 | architecture.md | ✓ | ✓ | 2024-01-10 | ⚠️ Stale |
 | progress.md | ✓ | ✓ | 2024-01-14 | OK |
 | patterns.md | ✓ | ✗ | 2024-01-01 | ⚠️ Empty |
+
+### Dependencies
+*(Omit section if no `dependencies.json`)*
+| Dependency | Type | Direction | Status |
+|---|---|---|---|
+| shared | local | upstream | ✓ Path valid, has `.project-context/` |
+| auth-service | git | upstream | ⚠️ Cache stale (12 days) — run `--fetch` |
+| web-app | local | downstream | ✓ Path valid |
 
 ### Issues Found
 1. **architecture.md**: Last updated 5 days ago, but 12 files changed since

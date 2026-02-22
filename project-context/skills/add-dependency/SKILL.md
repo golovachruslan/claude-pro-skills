@@ -76,10 +76,11 @@ Use AskUserQuestion to present discovered siblings:
 - List each sibling by name and relative path
 - "Other" for manual path entry
 
-### A4. Resolve Target Name
+### A4. Resolve Target Name and Description
 
-1. Read `[target-path]/.project-context/brief.md` → extract `**Project Name:**`
-2. Fall back to the directory name from the path
+1. Read `[target-path]/.project-context/brief.md` → extract `**Project Name:**` for name, fall back to directory name
+2. If `brief.md` exists, synthesize a concise one-line description from its Overview/intro section. Store as `[computed-description]`.
+3. If `brief.md` is absent or has no clear overview → set `[computed-description]` to `null` (omit field)
 
 ### A5–A7. Ask Direction, What, Notes
 
@@ -92,10 +93,13 @@ Add a **local path entry**:
 {
   "project": "[target-name]",
   "path": "[relative-path]",
+  "description": "[computed-description]",
   "what": "[what-shared]",
   "note": "[note or empty string]"
 }
 ```
+
+Omit `description` if `[computed-description]` is null.
 
 ### A9. Reciprocal Update
 
@@ -111,6 +115,7 @@ If yes: apply the same create-or-append logic to `[target-path]/.project-context
 ```
 Added dependency:
   [current] ──[direction]──▶ [target]
+  Description: [computed-description]   ← omit line if not computed
   What: [what]
 
 Files modified:
@@ -157,7 +162,7 @@ Options:
 
 ### B9. Create or Update dependencies.json
 
-Add a **git link entry**:
+Add a **git link entry** (without `description` yet — added in B10b after fetching):
 ```json
 {
   "project": "[project-name]",
@@ -180,6 +185,16 @@ python project-context/scripts/fetch_git_deps.py fetch --dir . --project [projec
 
 The script uses sparse-checkout (`--filter=blob:none --sparse`) to download only `.project-context/` from the remote — no application code is transferred. It copies the context files into `.project-context/.deps-cache/[project-name]/`, then cleans up the clone. No `.git/` is retained.
 
+### B10b. Auto-Compute Description
+
+After fetching, read `.project-context/.deps-cache/[project-name]/brief.md` if it exists.
+
+Synthesize a concise one-line description from its Overview/intro section. Store as `[computed-description]`.
+
+If the fetch failed, or `brief.md` is absent, or there is no clear overview: set `[computed-description]` to `null`.
+
+If `[computed-description]` is not null: read `dependencies.json`, add `"description": "[computed-description]"` to the entry, write back.
+
 ### B11. Confirmation
 
 ```
@@ -187,6 +202,7 @@ Added git dependency:
   [current] ──[direction]──▶ [target] (via git)
   Git:  [git-url]
   Ref:  [ref]
+  Description: [computed-description]   ← omit line if not computed
   What: [what]
 
 Fetched remote context to .deps-cache/[project-name]/:

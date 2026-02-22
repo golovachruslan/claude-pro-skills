@@ -35,12 +35,14 @@ Validate plans to ensure they are complete, actionable, and ready for implementa
 3. **Scope clarity** - Has in-scope/out-of-scope boundaries
 4. **Risk awareness** - At least one risk with mitigation (or explicit "no risks")
 5. **Measurability** - Success criteria are specific, not vague
+6. **Dependency awareness** - If `.project-context/dependencies.json` exists and plan tasks involve concepts matching a dependency's `what` field, verify the plan includes cross-project coordination: either a "Cross-Project Impact" section or explicit tasks like "Update shared types", "Verify downstream builds". Flag as Warning if absent.
 
 ### Red Flags
 
 - Vague tasks: "do the thing", "implement stuff", "fix issues"
 - Vague success: "works well", "users are happy", "looks good"
 - Unfilled placeholders: `[TODO]`, `[TBD]`, `[placeholder]`, `XXX`
+- Plan modifies shared API/types/utilities consumed by a downstream dependency but includes no coordination step
 
 ## Workflow
 
@@ -49,7 +51,7 @@ Validate plans to ensure they are complete, actionable, and ready for implementa
    ls -t .project-context/plans/*.md | head -1
    ```
 
-2. **Read and analyze** the plan content
+2. **Read and analyze** the plan content. Also check `dependencies.json` if present — needed for Quality Check #6.
 
 3. **Report findings**:
    - PASS: Plan is ready for implementation

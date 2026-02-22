@@ -117,6 +117,9 @@ Before implementing, read:
 - `.project-context/architecture.md` — Follow existing patterns
 - `.project-context/patterns.md` — Respect conventions
 - `.project-context/state.md` — Current position
+- `.project-context/dependencies.json` — Cross-project boundaries (if present)
+
+If `dependencies.json` exists, build a Dependency Digest (see `project-context/skills/project-context/references/dependency-loading.md`). Use it during execution to detect when tasks touch integration boundaries.
 
 ### Step 4: Initialize Task Tracking
 
@@ -154,6 +157,7 @@ When encountering unexpected situations during execution:
 | **Auto-fix** | Blocking issues (missing imports, broken deps) | Fix without asking |
 | **ASK** | Architecture changes (new tables, schema changes, framework switches) | **STOP and ask user** |
 | **ASK** | Scope expansion (features not in the plan) | **STOP and ask user** |
+| **ASK** | Changes that may break contracts with downstream dependencies (e.g., modifying shared types, API responses, exported interfaces listed in a dep's `what`) | **STOP and ask user** |
 | **NEVER** | Skip tests, ignore patterns, change unrelated code | Never do this |
 
 **Rule: ASK always supersedes Auto-fix/Auto-add.** When in doubt, ask.
@@ -167,6 +171,7 @@ After each phase:
 - Update `.project-context/progress.md` with completed items
 - Update plan file status (Planning → In Progress → Completed)
 - Mark native Tasks as completed
+- If any tasks touched files related to a dependency's `what` field, note it in state.md and consider running `/project-context:update` to propagate changes downstream
 
 ### Step 8: Summary
 
@@ -182,6 +187,9 @@ Files created:
 
 Files modified:
 - path/to/existing.ts
+
+Dependencies potentially affected:
+- [dep name]: [what was touched] — consider coordinating
 
 Next steps:
 1. [Testing recommendations]
