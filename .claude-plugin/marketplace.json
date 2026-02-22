@@ -18,7 +18,7 @@
     {
       "name": "obsidian",
       "description": "Obsidian note management with PARA method, MOCs, and formatting tools",
-      "version": "2.0.0",
+      "version": "2.3.0",
       "source": "./obsidian-plugin",
       "category": "productivity"
     },
@@ -31,9 +31,16 @@
     },
     {
       "name": "project-context",
-      "description": "Maintain project context across sessions with structured docs, Mermaid diagrams, and AI agent integration",
-      "version": "1.0.0",
+      "description": "Maintain project context across sessions with structured files, brainstorm-first workflow, federated dependency graph, and native Claude Code features (Agent Teams, Plan Mode, persistent Tasks)",
+      "version": "2.4.0",
       "source": "./project-context",
+      "category": "productivity"
+    },
+    {
+      "name": "agent-context",
+      "description": "Capture and save agent conversation context with key points and learnings to .agent-context folder for transferring context between agent sessions",
+      "version": "1.0.0",
+      "source": "./agent-context-plugin",
       "category": "productivity"
     }
   ]
