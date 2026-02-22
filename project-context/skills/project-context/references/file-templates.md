@@ -175,6 +175,7 @@ Supports two dependency types: **local path** (monorepo siblings) and **git link
     {
       "project": "shared",
       "path": "../shared",
+      "description": "Shared library providing domain types, validation logic, and common utilities",
       "what": "Types, validation utilities",
       "note": "Core domain types"
     },
@@ -182,6 +183,7 @@ Supports two dependency types: **local path** (monorepo siblings) and **git link
       "project": "auth-service",
       "git": "https://github.com/org/auth-service.git",
       "ref": "main",
+      "description": "Authentication microservice handling OAuth2 and JWT token lifecycle",
       "what": "Auth API types, JWT schemas",
       "note": "External auth service"
     }
@@ -203,7 +205,8 @@ Supports two dependency types: **local path** (monorepo siblings) and **git link
 |-------|----------|-------------|
 | `project` | Yes | Name of the dependency |
 | `path` | Yes | Relative path from this project (e.g., `../shared`) |
-| `what` | Yes | What is shared (types, API, utilities, etc.) |
+| `description` | No | One-line summary of what this project IS — auto-computed from its `brief.md`. Saves context by eliminating the need to load dep files for basic orientation. |
+| `what` | Yes | What is shared at the boundary (types, API, utilities, etc.) |
 | `note` | No | Additional context (can be empty string) |
 
 **Fields per entry (git link dependency):**
@@ -213,7 +216,8 @@ Supports two dependency types: **local path** (monorepo siblings) and **git link
 | `project` | Yes | Name of the dependency |
 | `git` | Yes | Git repository URL (HTTPS or SSH) |
 | `ref` | No | Branch, tag, or commit to track (default: `main`) |
-| `what` | Yes | What is shared (types, API, utilities, etc.) |
+| `description` | No | One-line summary of what this project IS — auto-computed from its cached `brief.md`. Saves context by eliminating the need to load dep files for basic orientation. |
+| `what` | Yes | What is shared at the boundary (types, API, utilities, etc.) |
 | `note` | No | Additional context (can be empty string) |
 
 A dependency entry uses either `path` (local) or `git` (remote), never both.

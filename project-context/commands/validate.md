@@ -39,6 +39,7 @@ cat .project-context/dependencies.json
 Validate:
 - Valid JSON with `upstream` and `downstream` arrays
 - Each entry has `project`, `what`, and either `path` or `git` (never both)
+- If `description` is present, it must be a non-empty string
 - For local path deps: path exists and target directory has `.project-context/`
 - For git link deps: `.project-context/.deps-cache/<project>/` exists
 - No orphaned cache entries (directories in `.deps-cache/` not declared in `dependencies.json`)

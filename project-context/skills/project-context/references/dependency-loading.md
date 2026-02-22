@@ -17,8 +17,8 @@ Read and parse `dependencies.json`. Produce a concise summary for your working c
 
 ```
 Dependency Map:
-↑ upstream: shared (local: ../shared) — provides: Types, validation utilities
-↑ upstream: auth-service (git, cached) — provides: Auth API types, JWT schemas
+↑ upstream: shared (local: ../shared) — "Shared library for domain types and validation" — provides: Types, validation utilities
+↑ upstream: auth-service (git, cached) — "Authentication microservice handling OAuth2 and JWT" — provides: Auth API types, JWT schemas
 ↓ downstream: web-app (local: ../web-app) — consumes: REST API endpoints
 ```
 
@@ -26,7 +26,8 @@ Format rules:
 - `↑ upstream` — projects this project depends on (consumes from)
 - `↓ downstream` — projects that depend on this project (consume from us)
 - Include `local: <path>` or `git, cached` / `git, not cached` in parens
-- Show the `what` field verbatim — it's the key routing signal
+- If `description` is present, include it in quotes immediately after the location — this gives instant orientation without loading any files
+- Show the `what` field verbatim — it's the key boundary routing signal
 
 ## Step 2: Boundary Detection
 
@@ -42,6 +43,8 @@ When a boundary is detected, flag it explicitly so it informs the rest of the wo
 ## Step 3: Selective Context Loading
 
 Load dep context **only for relevant dependencies**, not all of them.
+
+**If `description` is present:** the digest already provides basic orientation — skip loading `brief.md` unless the task requires detailed architectural understanding (internal structure, data flow, decision rationale).
 
 **For local path dependencies:**
 ```
