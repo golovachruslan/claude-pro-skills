@@ -12,7 +12,7 @@ allowed-tools:
 
 # Challenge Plan or Code
 
-Force critical evaluation of the current plan or code change using the `project-context:challenge-it` skill.
+Force critical evaluation of the current plan or code change using the `project-context:challenge` skill.
 
 ## Modes
 
@@ -98,7 +98,7 @@ I don't see a clear plan or code change to challenge. Could you:
 
 ## Output
 
-Use the output format from the challenge-it skill:
+Use the output format from the project-context:challenge skill:
 - Standard mode: All six perspectives + prioritized concerns + recommendation
 - Quick mode: Top 3 concerns with actions
 - Brutal mode: Six critics + domain critics, harsher analysis

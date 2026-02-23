@@ -1,5 +1,5 @@
 ---
-name: planner
+name: project-context:plan
 description: "Use when users request feature planning, project planning, or implementation planning. Triggers: 'plan this feature', 'help me plan', 'how should I implement'. Creates structured executable plans from locked decisions. Run /project-context:brainstorm first to brainstorm."
 allowed-tools:
   - AskUserQuestion
@@ -18,7 +18,7 @@ hooks:
 
             If it's NOT a plan file, return {"ok": true}.
 
-            If it IS a plan file, use the plan-verification skill to validate it.
+            If it IS a plan file, use the project-context:plan-verification skill to validate it.
             Return {"ok": true} if plan passes, or {"ok": false, "reason": "Issues found: ..."} if not.
           statusMessage: "Validating plan..."
           timeout: 60
