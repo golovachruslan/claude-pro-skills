@@ -1,5 +1,5 @@
 ---
-name: add-dependency
+name: project-context:add-dependency
 description: "Use when users want to add, declare, connect, fetch, or refresh cross-project dependencies — local paths (monorepo) or git URLs (remote repos). Triggers: 'add dependency', 'depends on', 'consumed by', 'this project uses', 'connect projects', 'add upstream', 'add downstream', 'link projects', 'git dependency', 'remote dependency', 'fetch deps', 'refresh deps', 'update deps', 'sync deps'."
 allowed-tools:
   - Read

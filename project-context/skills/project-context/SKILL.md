@@ -1,5 +1,5 @@
 ---
-name: project-context
+name: project-context:project-context
 description: "Use this skill when users ask about project context, project goals, current progress, architecture, technical decisions, project status, or current state. Triggers: 'what is this project', 'project goals', 'current progress', 'architecture', 'tech stack', 'what are we working on', 'project status', 'where are we'."
 ---
 

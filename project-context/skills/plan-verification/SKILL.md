@@ -1,5 +1,5 @@
 ---
-name: plan-verification
+name: project-context:plan-verification
 description: "Use to verify plan quality. Triggers: 'verify this plan', 'check the plan', 'validate plan'. Checks completeness, actionability, scope clarity, and risk coverage."
 allowed-tools:
   - Read
@@ -14,7 +14,7 @@ Validate plans to ensure they are complete, actionable, and ready for implementa
 
 - **On demand** when user asks to verify/validate a plan
 - **Before implementation** to confirm plan readiness
-- **Automatically** via planner skill hook after saving a plan
+- **Automatically** via project-context:plan skill hook after saving a plan
 
 ## Verification Criteria
 

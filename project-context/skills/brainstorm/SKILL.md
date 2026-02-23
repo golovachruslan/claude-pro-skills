@@ -1,5 +1,5 @@
 ---
-name: brainstorm
+name: project-context:brainstorm
 description: "Use when users want to brainstorm, discuss requirements, or explore ideas BEFORE planning. Triggers: 'let's discuss', 'brainstorm', 'think through', 'what should we consider', 'before we plan'. Captures decisions as locked constraints that flow into planning."
 allowed-tools:
   - AskUserQuestion
@@ -142,7 +142,7 @@ If saving, append to the plan file in `.project-context/plans/` or create a new 
 
 ## Integration with Planning
 
-The planner skill should:
+The project-context:plan skill should:
 1. Check for locked decisions before creating a plan
 2. Include a "Decisions" section in the plan referencing these
 3. Never override locked decisions without re-discussing

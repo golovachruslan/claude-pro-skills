@@ -41,7 +41,7 @@ Using Task subagents allows parallel exploration of multiple codebase areas, red
 
 ---
 
-Help me plan this feature or project. Use the `project-context:planner` skill to:
+Help me plan this feature or project. Use the `project-context:plan` skill to:
 
 1. Gather requirements through clarifying questions (never assume or guess)
 2. Understand technical constraints and preferences

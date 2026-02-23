@@ -86,14 +86,14 @@ When the feature description matches a dep's `what` field:
 - For downstream deps: "Downstream `[project]` consumes [what] from us — will this be a breaking change for them?"
 - If the dep's context is cached, load it and ask more specific questions based on its architecture
 
-### planner — Include cross-project coordination
+### project-context:plan — Include cross-project coordination
 
 When a plan task involves a dep boundary:
-- Add "Cross-Project Impact" section to the plan (see planner/SKILL.md template)
+- Add "Cross-Project Impact" section to the plan (see plan/SKILL.md template)
 - Add explicit coordination tasks: "Update shared types in [dep path]", "Verify [downstream] still builds"
 - Mark coordination tasks as dependencies of implementation tasks in the DAG
 
-### challenge-it — Evaluate integration risks
+### project-context:challenge — Evaluate integration risks
 
 When deps exist, each critic should explicitly evaluate:
 - **Chaos Engineer**: "What breaks in downstream `[dep]` if this change is deployed?"
