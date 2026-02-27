@@ -86,6 +86,20 @@ Options:
 If the user confirms:
 1. Create the `plans/` directory under `.project-context/` if it doesn't exist
 2. Save the plan with the selected filename in hyphen-case
-3. Update `.project-context/progress.md` to reference the new plan
 
 Plan verification runs automatically after saving (via skill hook).
+
+## MANDATORY: Sync Context Files After Save
+
+**CRITICAL: After saving the plan file, you MUST update context files before finishing. The plan command is NOT complete until this is done.**
+
+1. **Update `.project-context/state.md`**:
+   - Set current focus to the new plan
+   - Set next action to implement the plan
+   - Reference the plan file path
+
+2. **Update `.project-context/progress.md`**:
+   - Add an entry with today's date referencing the new plan
+   - Place it in the appropriate section (Upcoming/In Progress)
+
+**Do NOT present a final summary or consider the command finished until both files are updated.** The PostToolUse hook will verify this.

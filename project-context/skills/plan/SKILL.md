@@ -18,10 +18,17 @@ hooks:
 
             If it's NOT a plan file, return {"ok": true}.
 
-            If it IS a plan file, use the project-context:plan-verification skill to validate it.
-            Return {"ok": true} if plan passes, or {"ok": false, "reason": "Issues found: ..."} if not.
-          statusMessage: "Validating plan..."
-          timeout: 60
+            If it IS a plan file:
+            1. Use the project-context:plan-verification skill to validate plan structure.
+            2. Then check if .project-context/state.md and .project-context/progress.md
+               have been updated to reference this plan. Read both files and look for
+               a reference to the plan filename.
+               - If BOTH files reference the plan → return {"ok": true}
+               - If either file is MISSING the plan reference → return {"ok": false,
+                 "reason": "Context files not synced. You MUST update state.md (set current focus and next action to reference the plan) and progress.md (add plan entry with date) before finishing. This is mandatory per Step 7 of the planning workflow."}
+            Return {"ok": true} if everything passes, or {"ok": false, "reason": "..."} if not.
+          statusMessage: "Validating plan and context sync..."
+          timeout: 90
 ---
 
 # Feature & Project Planning Skill
@@ -154,9 +161,51 @@ After creating the plan, **register tasks in Claude Code's native task system** 
 **Always ask the user** if they want to save:
 - Propose hyphen-case filename from feature name
 - Save to `.project-context/plans/[name].md`
-- Update `progress.md` and `state.md` to reference the plan
 
 Plan verification runs automatically after saving (via skill hook).
+
+### 7. MANDATORY: Sync Context Files
+
+**CRITICAL: This step is NOT optional. The plan command is NOT complete until context files are updated.**
+
+After saving the plan file, you MUST update these `.project-context/` files before presenting any summary:
+
+#### 7a. Update `state.md`
+
+Read current `state.md`, then use Edit to update:
+- **Current Focus** → set to the new plan name and goal
+- **Next Action** → set to "Implement plan" or "Review plan with team"
+- **Active Plan** → reference the saved plan file path
+
+Example update:
+```markdown
+## Current Focus
+Planning: [Feature Name] — see `.project-context/plans/[name].md`
+
+## Next Action
+Implement plan via `/project-context:implement plans/[name].md`
+```
+
+#### 7b. Update `progress.md`
+
+Read current `progress.md`, then use Edit to add the plan to the appropriate section:
+- Add to **Upcoming** or **In Progress** section with today's date
+- Reference the plan file path
+
+Example update:
+```markdown
+- **YYYY-MM-DD**: Plan created — [Feature Name] ([plans/[name].md])
+```
+
+#### 7c. Verify Updates
+
+After editing both files, confirm that:
+- `state.md` references the new plan
+- `progress.md` has an entry for the plan
+
+**Only after completing Steps 7a-7c should you present the final summary to the user.**
+
+The PostToolUse hook will verify context files were updated after plan save.
 
 ## Reference
 
