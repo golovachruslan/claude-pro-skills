@@ -102,4 +102,13 @@ Plan verification runs automatically after saving (via skill hook).
    - Add an entry with today's date referencing the new plan
    - Place it in the appropriate section (Upcoming/In Progress)
 
-**Do NOT present a final summary or consider the command finished until both files are updated.** The PostToolUse hook will verify this.
+3. **Evaluate `.project-context/architecture.md`** (if applicable):
+   - If the plan introduces new components, changes system flows, or adds technology, update `architecture.md`
+   - Add a **Key Decisions** entry with today's date for significant architectural choices made during planning
+   - Update the Mermaid diagram if new components or flows are planned
+
+4. **Evaluate `.project-context/patterns.md`** (if applicable):
+   - If planning established new conventions or pattern decisions (e.g., "we'll use repository pattern for data access"), add them to `patterns.md`
+   - Skip if no new patterns were decided during planning
+
+**Do NOT present a final summary or consider the command finished until all applicable files are updated.** The PostToolUse hook will verify this.

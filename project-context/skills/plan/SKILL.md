@@ -197,13 +197,32 @@ Example update:
 - **YYYY-MM-DD**: Plan created — [Feature Name] ([plans/[name].md])
 ```
 
-#### 7c. Verify Updates
+#### 7c. Evaluate `architecture.md` (if applicable)
 
-After editing both files, confirm that:
+If the plan introduces architectural changes (new components, flows, technology, integration points):
+- Read current `architecture.md`, then Edit to update
+- Add planned components to the Mermaid diagram
+- Add a **Key Decisions** entry with date and rationale
+
+Skip if the plan doesn't affect architecture.
+
+#### 7d. Evaluate `patterns.md` (if applicable)
+
+If the plan established new conventions or pattern decisions:
+- Read current `patterns.md`, then Edit to add new patterns
+- Example: "Decided to use repository pattern for data access" → add to Code Patterns
+
+Skip if no new patterns were decided during planning.
+
+#### 7e. Verify Updates
+
+After editing files, confirm that:
 - `state.md` references the new plan
 - `progress.md` has an entry for the plan
+- `architecture.md` updated if architectural changes are planned
+- `patterns.md` updated if new patterns were decided
 
-**Only after completing Steps 7a-7c should you present the final summary to the user.**
+**Only after completing Steps 7a-7e should you present the final summary to the user.**
 
 The PostToolUse hook will verify context files were updated after plan save.
 

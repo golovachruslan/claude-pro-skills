@@ -222,24 +222,52 @@ Example:
   - Plan: `.project-context/plans/[name].md`
 ```
 
-#### 7d. Update `.project-context/patterns.md` (if applicable)
+#### 7d. Evaluate `.project-context/architecture.md` (if applicable)
 
-If new patterns were established or discovered during implementation, add them:
-- New coding conventions followed
-- Error handling approaches used
-- Integration patterns established
+Review the implementation and check — did it:
+- Add new components, services, or modules?
+- Change system flows or data flows?
+- Introduce new technology or libraries?
+- Modify integration points or API boundaries?
+- Change deployment or infrastructure patterns?
 
-Only add patterns that are reusable — skip one-off implementation details.
+**If YES to any:** Read current `architecture.md`, then Edit to add/update:
+- New components in the **System Overview** Mermaid diagram with step-by-step description
+- Updated flows reflecting the changes
+- New entries in **Key Decisions** table with date and rationale
+- Updated **Tech Stack** table if new technology was introduced
 
-#### 7e. Verify All Updates
+**If NO to all:** Skip — note "no architectural changes" in the summary.
+
+#### 7e. Evaluate `.project-context/patterns.md` (if applicable)
+
+Review the implementation and check — did it:
+- Establish a new coding convention or reusable pattern?
+- Discover an anti-pattern to avoid in the future?
+- Use a notable error handling or integration approach?
+- Adopt a naming convention or organizational structure?
+- Find a solution to a recurring problem?
+
+**If YES to any:** Read current `patterns.md`, then Edit to add:
+- New pattern in **When / Example / Notes** format
+- New anti-pattern in **Problem → Do This Instead** format
+- New convention in the appropriate table
+- New learning under the **Learnings** section
+
+Only add patterns that are **reusable** — skip one-off implementation details.
+
+**If NO to all:** Skip — note "no new patterns" in the summary.
+
+#### 7f. Verify All Updates
 
 Confirm that:
 - [ ] Plan file status is updated
 - [ ] `state.md` reflects current position post-implementation
 - [ ] `progress.md` has entries for completed work
-- [ ] `patterns.md` updated if new patterns emerged
+- [ ] `architecture.md` evaluated — updated if architectural changes occurred
+- [ ] `patterns.md` evaluated — updated if new patterns emerged
 
-**Only after completing 7a–7e should you proceed to Step 8.**
+**Only after completing 7a–7f should you proceed to Step 8.**
 
 ### Step 8: Summary
 
@@ -259,6 +287,7 @@ Files modified:
 Context files updated:
 - state.md — current focus and next action updated
 - progress.md — completed items recorded
+- architecture.md — [updated: new components/flows | no architectural changes]
 - patterns.md — [new patterns added / no new patterns]
 - plans/[name].md — status set to Completed
 

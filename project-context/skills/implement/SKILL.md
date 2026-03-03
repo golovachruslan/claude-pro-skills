@@ -33,11 +33,27 @@ hooks:
             2. Read .project-context/progress.md — it should have a recent entry referencing
                the completed feature/plan.
 
-            If BOTH files appear updated with completion info → return {"ok": true}
+            If BOTH files appear updated with completion info, continue to step 3.
             If either file is missing completion info → return {"ok": false,
               "reason": "Implementation marked complete but context files not synced. You MUST update state.md (set current focus to completed feature, set next action) and progress.md (add completed items with date) before finishing. This is mandatory per Step 7 of the implement workflow."}
+
+            3. Check architecture.md and patterns.md (soft check — warning, not blocking):
+               Read .project-context/architecture.md and .project-context/patterns.md.
+               Read the plan file to understand what was implemented.
+
+               Build a warning message if applicable:
+               - If the plan added new components, services, tech, or changed flows AND
+                 architecture.md doesn't appear to reflect these → add warning:
+                 "Consider updating architecture.md — implementation added new components/flows."
+               - If the plan established new patterns or conventions AND
+                 patterns.md doesn't appear to reflect these → add warning:
+                 "Consider updating patterns.md — implementation established new patterns."
+
+               If warnings exist → return {"ok": true,
+                 "warning": "[warnings joined]. Run Step 7d-7e of the implement workflow to evaluate whether these files need updating."}
+               If no warnings → return {"ok": true}
           statusMessage: "Verifying context sync..."
-          timeout: 90
+          timeout: 120
 ---
 
 # Implementation Skill
@@ -46,16 +62,30 @@ This skill enforces context file synchronization when plans are implemented. It 
 
 ## Context Sync Enforcement
 
-The PostToolUse hook on this skill monitors plan file edits. When a plan's status is changed to "Completed", the hook verifies that `.project-context/state.md` and `.project-context/progress.md` have been updated accordingly.
+The PostToolUse hook on this skill monitors plan file edits. When a plan's status is changed to "Completed", the hook enforces a two-tier check:
 
-If context files are not updated, the hook returns an error instructing the agent to update them before proceeding.
+### Tier 1 — Hard enforcement (blocks completion)
+- **state.md** must reflect post-implementation state (current focus, next action)
+- **progress.md** must have entries for completed work with dates
+
+If either is missing, the hook returns an error and the agent must update them before proceeding.
+
+### Tier 2 — Soft enforcement (warns but doesn't block)
+- **architecture.md** — warns if the implementation added components, flows, or technology that aren't reflected
+- **patterns.md** — warns if new patterns or conventions were established but not recorded
+
+Soft warnings prompt the agent to evaluate Steps 7d-7e of the implement workflow.
 
 ## Required Updates on Plan Completion
 
-When marking a plan as completed, you MUST also update:
+When marking a plan as completed, you MUST:
 
-1. **state.md** — Current focus, next action, recently completed
-2. **progress.md** — Completed items with dates and deliverables
-3. **patterns.md** — Any new patterns discovered (if applicable)
+1. **state.md** — Update current focus, next action, recently completed
+2. **progress.md** — Add completed items with dates and deliverables
 
-See the `/project-context:implement` command for full workflow details.
+And you MUST evaluate (update only if applicable):
+
+3. **architecture.md** — If new components, flows, tech, or integration points were added
+4. **patterns.md** — If new coding patterns, conventions, or anti-patterns were discovered
+
+See the `/project-context:implement` command Steps 7a-7f for full workflow details.
