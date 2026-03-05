@@ -164,14 +164,110 @@ When encountering unexpected situations during execution:
 
 **Agent Teams deviation handling:** Teammates should message the team lead when they encounter ASK-level deviations. The lead coordinates with the user and broadcasts the decision to all teammates.
 
-### Step 7: Update State
+### Step 7: MANDATORY — Sync Context Files
 
-After each phase:
-- Update `.project-context/state.md` with current position
-- Update `.project-context/progress.md` with completed items
-- Update plan file status (Planning → In Progress → Completed)
-- Mark native Tasks as completed
-- If any tasks touched files related to a dependency's `what` field, note it in state.md and consider running `/project-context:update` to propagate changes downstream
+**CRITICAL: This step is NOT optional. The implement command is NOT complete until all context files are updated. Do NOT present the final summary until this step is fully done.**
+
+After completing implementation (or after each phase for multi-phase plans), you MUST update these files:
+
+#### 7a. Update plan file status
+
+Edit the plan file to change:
+- `**Status:** Planning` → `**Status:** In Progress` (during execution)
+- `**Status:** In Progress` → `**Status:** Completed` (when all phases done)
+- Mark individual tasks as completed within the plan
+
+#### 7b. Update `.project-context/state.md`
+
+Read current `state.md`, then use Edit to update:
+
+- **Current Focus** → what was just completed or what's in progress
+- **Next Action** → next step after implementation (testing, review, deploy, etc.)
+- **Blockers** → any issues discovered during implementation
+
+Example after full completion:
+```markdown
+## Current Focus
+Completed: [Feature Name] implementation — all [N] phases done
+
+## Next Action
+Run full test suite and review changes before merging
+
+## Recently Completed
+- [Feature Name] — implemented via `.project-context/plans/[name].md`
+```
+
+Example after partial completion (phase N of M):
+```markdown
+## Current Focus
+Implementing: [Feature Name] — Phase [N] of [M] complete
+
+## Next Action
+Continue with Phase [N+1]: [Phase Name]
+```
+
+#### 7c. Update `.project-context/progress.md`
+
+Read current `progress.md`, then use Edit to:
+
+- Move completed items from **In Progress** / **Upcoming** to **Completed** section
+- Add entries with today's date for each completed phase/feature
+- Reference specific deliverables (files created, endpoints added, etc.)
+
+Example:
+```markdown
+## Completed
+- **YYYY-MM-DD**: [Feature Name] — Phase 1: [description], Phase 2: [description]
+  - Files: `path/to/new-file.ts`, `path/to/modified-file.ts`
+  - Plan: `.project-context/plans/[name].md`
+```
+
+#### 7d. Evaluate `.project-context/architecture.md` (if applicable)
+
+Review the implementation and check — did it:
+- Add new components, services, or modules?
+- Change system flows or data flows?
+- Introduce new technology or libraries?
+- Modify integration points or API boundaries?
+- Change deployment or infrastructure patterns?
+
+**If YES to any:** Read current `architecture.md`, then Edit to add/update:
+- New components in the **System Overview** Mermaid diagram with step-by-step description
+- Updated flows reflecting the changes
+- New entries in **Key Decisions** table with date and rationale
+- Updated **Tech Stack** table if new technology was introduced
+
+**If NO to all:** Skip — note "no architectural changes" in the summary.
+
+#### 7e. Evaluate `.project-context/patterns.md` (if applicable)
+
+Review the implementation and check — did it:
+- Establish a new coding convention or reusable pattern?
+- Discover an anti-pattern to avoid in the future?
+- Use a notable error handling or integration approach?
+- Adopt a naming convention or organizational structure?
+- Find a solution to a recurring problem?
+
+**If YES to any:** Read current `patterns.md`, then Edit to add:
+- New pattern in **When / Example / Notes** format
+- New anti-pattern in **Problem → Do This Instead** format
+- New convention in the appropriate table
+- New learning under the **Learnings** section
+
+Only add patterns that are **reusable** — skip one-off implementation details.
+
+**If NO to all:** Skip — note "no new patterns" in the summary.
+
+#### 7f. Verify All Updates
+
+Confirm that:
+- [ ] Plan file status is updated
+- [ ] `state.md` reflects current position post-implementation
+- [ ] `progress.md` has entries for completed work
+- [ ] `architecture.md` evaluated — updated if architectural changes occurred
+- [ ] `patterns.md` evaluated — updated if new patterns emerged
+
+**Only after completing 7a–7f should you proceed to Step 8.**
 
 ### Step 8: Summary
 
@@ -188,12 +284,19 @@ Files created:
 Files modified:
 - path/to/existing.ts
 
+Context files updated:
+- state.md — current focus and next action updated
+- progress.md — completed items recorded
+- architecture.md — [updated: new components/flows | no architectural changes]
+- patterns.md — [new patterns added / no new patterns]
+- plans/[name].md — status set to Completed
+
 Dependencies potentially affected:
 - [dep name]: [what was touched] — consider coordinating
 
 Next steps:
 1. [Testing recommendations]
-2. [Consider running /project-context:update --chat to capture learnings]
+2. [Consider running /project-context:update --chat to capture additional learnings]
 ```
 
 ## Multi-Agent Execution Patterns
