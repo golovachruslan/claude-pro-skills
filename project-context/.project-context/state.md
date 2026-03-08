@@ -3,11 +3,11 @@
 ## Current Position
 **Phase:** Active Development
 **Active Plan:** none
-**Focus:** Create deps support — fetching cross-project dependencies from local paths and git URLs
+**Focus:** Maintenance / feature exploration — no active planned work
 
 ## Session Info
-**Last Session:** 2026-02-20
-**Context:** Initialized project context
+**Last Session:** 2026-03-08
+**Context:** Command consolidation refactor shipped (v2.6.0) — thin command wrappers removed, skills invoke directly
 
 ## Blockers
 - None
@@ -16,7 +16,7 @@
 - None
 
 ## Next Action
-Run `/project-context:discuss` to brainstorm deps support design
+Pick next feature or run `/project-context:brainstorm` to explore ideas
 
 ---
-*Last updated: 2026-02-20*
+*Last updated: 2026-03-08*
