@@ -1,6 +1,6 @@
 ---
 name: mermaid
-description: Create Mermaid diagrams with renderer-compatible syntax and human-readable ASCII sidecars. Use when user asks to create diagrams, flowcharts, sequence diagrams, ER diagrams, state diagrams, class diagrams, visualize data flow, or mentions Mermaid, visual documentation, or chart creation.
+description: This skill should be used when the user asks to "create a diagram", "make a flowchart", "draw a sequence diagram", "visualize architecture", "create ER diagram", "state diagram", "class diagram", "visualize data flow", "generate chart", or mentions Mermaid, visual documentation, chart creation, or diagramming. Creates renderer-compatible Mermaid diagrams with human-readable ASCII sidecars.
 ---
 
 # Mermaid Diagrams
