@@ -7,12 +7,17 @@
 # Usage:
 #   bash setup.sh            # Install everything
 #   bash setup.sh --dry-run  # Preview commands without executing
+#   bash setup.sh --force    # Re-run even if already completed
+#
+# Idempotency: creates .setup-done marker on success; skips if marker exists.
+# Use --force to bypass the marker check.
 #
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG="$SCRIPT_DIR/setup.yaml"
+MARKER="$SCRIPT_DIR/.setup-done"
 
 # --- Colors & helpers ---
 
@@ -24,12 +29,27 @@ BOLD='\033[1m'
 NC='\033[0m'
 
 DRY_RUN=false
+FORCE=false
 PASS=0
 FAIL=0
 
-if [[ "${1:-}" == "--dry-run" ]]; then
-  DRY_RUN=true
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run) DRY_RUN=true ;;
+    --force)   FORCE=true ;;
+  esac
+done
+
+if $DRY_RUN; then
   echo -e "${YELLOW}${BOLD}DRY RUN MODE${NC} — commands will be printed but not executed\n"
+fi
+
+# --- Idempotency check ---
+
+if [[ -f "$MARKER" ]] && ! $FORCE && ! $DRY_RUN; then
+  echo -e "${GREEN}Setup already completed${NC} (marker: $MARKER)"
+  echo -e "Use ${BOLD}--force${NC} to re-run."
+  exit 0
 fi
 
 run_cmd() {
@@ -149,6 +169,13 @@ if [[ $FAIL -gt 0 ]]; then
   echo -e "  ${RED}Failed: ${FAIL}${NC}"
 fi
 echo ""
+
+# --- Create marker on success (skip in dry-run) ---
+
+if ! $DRY_RUN && [[ $FAIL -eq 0 ]]; then
+  date -u '+%Y-%m-%dT%H:%M:%SZ' > "$MARKER"
+  echo -e "Marker created: ${MARKER}"
+fi
 
 if $DRY_RUN; then
   echo -e "Run ${BOLD}bash setup.sh${NC} (without --dry-run) to execute."

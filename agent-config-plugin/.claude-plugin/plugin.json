@@ -1,0 +1,14 @@
+{
+  "name": "agent-config",
+  "version": "1.0.0",
+  "description": "Configure Claude Code plugin ecosystems for projects — generates setup.yaml, setup.sh, and a SessionStart hook so teammates get all plugins automatically",
+  "author": {
+    "name": "Ruslan Halavach",
+    "email": "golovachruslan@gmail.com"
+  },
+  "repository": "https://github.com/golovachruslan/claude-pro-skills",
+  "license": "MIT",
+  "keywords": ["setup", "plugins", "marketplace", "onboarding", "ecosystem", "session-start"],
+  "commands": "./commands",
+  "skills": "./skills"
+}
