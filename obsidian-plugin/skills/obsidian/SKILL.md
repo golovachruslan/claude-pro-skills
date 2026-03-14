@@ -1,5 +1,5 @@
 ---
-name: Obsidian Note Management
+name: obsidian-note-management
 description: This skill should be used when the user asks to "create an Obsidian note", "make a new note", "add a note to vault", "organize notes", "create a MOC", "create daily note", "use PARA method", "add wikilinks", "create callouts", "add frontmatter", or mentions Obsidian-specific features like embeds, tags, or vault organization.
 version: 0.2.0
 ---

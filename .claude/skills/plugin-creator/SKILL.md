@@ -1,7 +1,5 @@
 ---
-description: Automatically creates new claude code plugins with proper structure,
-  validation, and marketplace integration when user mentions creating a plugin, new
-  plugin, or plugin from template. specific to claude-code-plugins repository workflow.
+description: "This skill should be used when the user asks to 'create a plugin', 'new plugin', 'scaffold plugin', 'generate plugin', 'plugin from template', or 'add new plugin to marketplace'. Scaffolds Claude Code plugins with proper structure, validation, and marketplace integration."
 allowed-tools:
 - Write
 - Read
@@ -24,7 +22,7 @@ Automatically scaffolds new Claude Code plugins with complete directory structur
 
 ## Plugin Creation Process
 
-When activated, I will:
+To create a plugin:
 
 1. **Gather Requirements**
    - Plugin name (kebab-case)
@@ -142,7 +140,7 @@ allowed-tools: Read, Write, Grep
 
 ## Marketplace Integration
 
-I automatically:
+Automatic marketplace integration:
 1. Add plugin entry to `marketplace.extended.json`
 2. Run `npm run sync-marketplace` to update CLI catalog
 3. Validate both catalogs with `jq`
@@ -172,7 +170,7 @@ After creation:
 
 ## Output
 
-I provide:
+Expected output:
 ```
 ✅ Created plugin: plugin-name
 📁 Location: plugins/category/plugin-name/
@@ -192,7 +190,7 @@ Next steps:
 
 **User says:** "Create a new security plugin called 'owasp-scanner' with commands"
 
-**I automatically:**
+**Steps taken:**
 1. Create directory: `plugins/security/owasp-scanner/`
 2. Generate plugin.json, README, LICENSE
 3. Create `commands/` with example
@@ -203,7 +201,7 @@ Next steps:
 
 **User says:** "Scaffold a Skills plugin for code review"
 
-**I automatically:**
+**Steps taken:**
 1. Create directory with `skills/` subdirectories
 2. Generate SKILL.md templates
 3. Add trigger keywords for code review
