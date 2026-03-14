@@ -102,10 +102,10 @@ The script adds all marketplaces, installs all plugins, and enables them. It's i
 
 **Prerequisites**: The `claude` CLI must be installed (`npm install -g @anthropic-ai/claude-code`).
 
-**Auto-setup on clone**: Enable the git hook to run setup automatically on first checkout:
+**Auto-setup on clone**: Install the git hook to run setup automatically on first checkout:
 
 ```bash
-git config core.hooksPath .githooks
+bash install-hooks.sh
 ```
 
 After this, cloning the repo will auto-install all plugins. To re-trigger, delete `.setup-done` and run `bash setup.sh`.
