@@ -84,6 +84,32 @@ claude-pro-skills/
 └── README.md
 ```
 
+## Quick Setup
+
+To replicate the full plugin ecosystem (6 marketplaces, 21 plugins) with a single command:
+
+```bash
+bash setup.sh
+```
+
+Preview what will be installed without making changes:
+
+```bash
+bash setup.sh --dry-run
+```
+
+The script adds all marketplaces, installs all plugins, and enables them. It's idempotent — safe to re-run on an existing setup.
+
+**Prerequisites**: The `claude` CLI must be installed (`npm install -g @anthropic-ai/claude-code`).
+
+**Auto-setup on clone**: Install the git hook to run setup automatically on first checkout:
+
+```bash
+bash install-hooks.sh
+```
+
+After this, cloning the repo will auto-install all plugins. To re-trigger, delete `.setup-done` and run `bash setup.sh`.
+
 ## Contributing
 
 Contributions are welcome! Please ensure any new plugins follow the Claude Code plugin structure and are added to the marketplace.json file.
