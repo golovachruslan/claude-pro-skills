@@ -2,6 +2,8 @@
 #
 # setup.sh - Set up the full Claude Pro Skills plugin ecosystem
 #
+# Reads marketplaces and plugins from setup.yaml
+#
 # Usage:
 #   bash setup.sh            # Install everything
 #   bash setup.sh --dry-run  # Preview commands without executing
@@ -9,49 +11,8 @@
 
 set -euo pipefail
 
-# --- Configuration ---
-
-MARKETPLACES=(
-  "davila7/claude-code-templates"
-  "anthropics/skills"
-  "https://github.com/anthropics/claude-code.git --sparse .claude-plugin plugins"
-  "anthropics/claude-plugins-official"
-  "golovachruslan/claude-pro-skills"
-  "kepano/obsidian-skills"
-)
-
-PLUGINS=(
-  # claude-code-templates
-  "security-pro@claude-code-templates"
-  "git-workflow@claude-code-templates"
-
-  # claude-code-plugins (anthropics/claude-code repo)
-  "plugin-dev@claude-code-plugins"
-  "security-guidance@claude-code-plugins"
-  "feature-dev@claude-code-plugins"
-  "frontend-design@claude-code-plugins"
-
-  # claude-plugins-official
-  "playwright@claude-plugins-official"
-  "plugin-dev@claude-plugins-official"
-  "commit-commands@claude-plugins-official"
-  "hookify@claude-plugins-official"
-  "skill-creator@claude-plugins-official"
-  "playground@claude-plugins-official"
-  "frontend-design@claude-plugins-official"
-  "code-simplifier@claude-plugins-official"
-  "claude-md-management@claude-plugins-official"
-
-  # claude-pro-skills (this repo)
-  "obsidian@claude-pro-skills"
-  "skills-improver@claude-pro-skills"
-  "project-context@claude-pro-skills"
-  "agent-context@claude-pro-skills"
-  "mermaid@claude-pro-skills"
-
-  # obsidian-skills
-  "obsidian@obsidian-skills"
-)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG="$SCRIPT_DIR/setup.yaml"
 
 # --- Colors & helpers ---
 
@@ -60,12 +21,11 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 BOLD='\033[1m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 DRY_RUN=false
 PASS=0
 FAIL=0
-SKIP=0
 
 if [[ "${1:-}" == "--dry-run" ]]; then
   DRY_RUN=true
@@ -77,23 +37,48 @@ run_cmd() {
     echo -e "  ${BLUE}[dry-run]${NC} $*"
     return 0
   fi
+  "$@" 2>&1
+}
 
-  if "$@" 2>&1; then
-    return 0
-  else
-    return 1
-  fi
+# Parse YAML list items (lines matching "  - value") under a given key
+parse_yaml_list() {
+  local key="$1"
+  local file="$2"
+  sed -n "/^${key}:/,/^[^ #-]/p" "$file" \
+    | grep '^[[:space:]]*-' \
+    | sed 's/^[[:space:]]*-[[:space:]]*//' \
+    | sed 's/[[:space:]]*#.*//'
 }
 
 # --- Prerequisites ---
 
 echo -e "${BOLD}Checking prerequisites...${NC}"
+
+if [[ ! -f "$CONFIG" ]]; then
+  echo -e "${RED}Error: setup.yaml not found at ${CONFIG}${NC}"
+  exit 1
+fi
+
 if ! command -v claude &>/dev/null; then
   echo -e "${RED}Error: 'claude' CLI not found. Install it first:${NC}"
   echo "  npm install -g @anthropic-ai/claude-code"
   exit 1
 fi
-echo -e "${GREEN}  claude CLI found${NC}\n"
+
+echo -e "${GREEN}  claude CLI found${NC}"
+echo -e "${GREEN}  config: ${CONFIG}${NC}\n"
+
+# --- Read config ---
+
+MARKETPLACES=()
+while IFS= read -r line; do
+  MARKETPLACES+=("$line")
+done < <(parse_yaml_list "marketplaces" "$CONFIG")
+
+PLUGINS=()
+while IFS= read -r line; do
+  PLUGINS+=("$line")
+done < <(parse_yaml_list "plugins" "$CONFIG")
 
 # --- Add marketplaces ---
 
@@ -158,7 +143,6 @@ echo ""
 
 # --- Summary ---
 
-TOTAL=$((PASS + FAIL + SKIP))
 echo -e "${BOLD}Done!${NC}"
 echo -e "  ${GREEN}Passed: ${PASS}${NC}"
 if [[ $FAIL -gt 0 ]]; then

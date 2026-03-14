@@ -1,2 +1,5 @@
 # Claude Code temporary worktrees
 .claude/worktrees/
+
+# Setup marker (created by post-checkout hook)
+.setup-done

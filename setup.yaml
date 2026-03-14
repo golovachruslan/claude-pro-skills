@@ -1,0 +1,39 @@
+marketplaces:
+  - davila7/claude-code-templates
+  - anthropics/skills
+  - https://github.com/anthropics/claude-code.git --sparse .claude-plugin plugins
+  - anthropics/claude-plugins-official
+  - golovachruslan/claude-pro-skills
+  - kepano/obsidian-skills
+
+plugins:
+  # claude-code-templates
+  - security-pro@claude-code-templates
+  - git-workflow@claude-code-templates
+
+  # claude-code-plugins (anthropics/claude-code repo)
+  - plugin-dev@claude-code-plugins
+  - security-guidance@claude-code-plugins
+  - feature-dev@claude-code-plugins
+  - frontend-design@claude-code-plugins
+
+  # claude-plugins-official
+  - playwright@claude-plugins-official
+  - plugin-dev@claude-plugins-official
+  - commit-commands@claude-plugins-official
+  - hookify@claude-plugins-official
+  - skill-creator@claude-plugins-official
+  - playground@claude-plugins-official
+  - frontend-design@claude-plugins-official
+  - code-simplifier@claude-plugins-official
+  - claude-md-management@claude-plugins-official
+
+  # claude-pro-skills (this repo)
+  - obsidian@claude-pro-skills
+  - skills-improver@claude-pro-skills
+  - project-context@claude-pro-skills
+  - agent-context@claude-pro-skills
+  - mermaid@claude-pro-skills
+
+  # obsidian-skills
+  - obsidian@obsidian-skills
