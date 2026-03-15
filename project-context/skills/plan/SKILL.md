@@ -52,15 +52,14 @@ Create structured, executable implementation plans. **Plans should flow from loc
 ls .project-context/*.md 2>/dev/null
 ```
 
-If context exists, read:
-- `brief.md` — goals, scope, constraints
-- `architecture.md` — tech stack, system design
-- `patterns.md` — established conventions
-- `state.md` — current position, blockers
-- `dependencies.json` — cross-project relationships (if present)
-- `plans/*.md` — check for existing discussions/decisions
+If context exists, read selectively:
+- **Always:** `brief.md` (goals/scope) + `state.md` (current position, existing plans)
+- **If feature involves architecture:** `architecture.md` (tech stack, system design)
+- **If feature involves coding patterns:** `patterns.md` (established conventions)
+- **If cross-project:** `dependencies.json` → build Dependency Digest (see `references/dependency-loading.md`)
+- **Check:** `plans/*.md` for existing discussions/decisions on this topic
 
-If `dependencies.json` exists, build a Dependency Digest (see `project-context/skills/project-context/references/dependency-loading.md`). Use it in Step 4 to identify whether the plan touches integration boundaries and whether cross-project coordination tasks are needed.
+Skip files not relevant to the feature being planned. You'll read `state.md` and `progress.md` again in Step 7, but their content from Step 1 is already in conversation context — use Edit directly without re-reading.
 
 Use context to ask **informed** questions (reference specific tech, patterns, decisions).
 
@@ -170,61 +169,24 @@ Plan verification runs automatically after saving (via skill hook).
 
 After saving the plan file, you MUST update these `.project-context/` files before presenting any summary:
 
+**Context files were already read in Step 1 — do NOT re-read them. Use Edit directly.**
+
 #### 7a. Update `state.md`
-
-Read current `state.md`, then use Edit to update:
-- **Current Focus** → set to the new plan name and goal
-- **Next Action** → set to "Implement plan" or "Review plan with team"
-- **Active Plan** → reference the saved plan file path
-
-Example update:
-```markdown
-## Current Focus
-Planning: [Feature Name] — see `.project-context/plans/[name].md`
-
-## Next Action
-Implement plan via `/project-context:implement plans/[name].md`
-```
+Use Edit to update **Current Focus**, **Next Action**, and **Active Plan** to reference the new plan.
 
 #### 7b. Update `progress.md`
+Use Edit to add a dated plan entry to the **Upcoming** or **In Progress** section.
 
-Read current `progress.md`, then use Edit to add the plan to the appropriate section:
-- Add to **Upcoming** or **In Progress** section with today's date
-- Reference the plan file path
+#### 7c. Evaluate `architecture.md` (only if plan introduces new components, flows, or tech)
+If applicable, use Edit to add planned components to diagrams and a **Key Decisions** entry. If architecture.md was not read in Step 1, read it now. Skip otherwise.
 
-Example update:
-```markdown
-- **YYYY-MM-DD**: Plan created — [Feature Name] ([plans/[name].md])
-```
+#### 7d. Evaluate `patterns.md` (only if plan established new conventions)
+If applicable, use Edit to add new patterns. If patterns.md was not read in Step 1, read it now. Skip otherwise.
 
-#### 7c. Evaluate `architecture.md` (if applicable)
+#### 7e. Verify
+Confirm state.md and progress.md reference the plan. The PostToolUse hook enforces this.
 
-If the plan introduces architectural changes (new components, flows, technology, integration points):
-- Read current `architecture.md`, then Edit to update
-- Add planned components to the Mermaid diagram
-- Add a **Key Decisions** entry with date and rationale
-
-Skip if the plan doesn't affect architecture.
-
-#### 7d. Evaluate `patterns.md` (if applicable)
-
-If the plan established new conventions or pattern decisions:
-- Read current `patterns.md`, then Edit to add new patterns
-- Example: "Decided to use repository pattern for data access" → add to Code Patterns
-
-Skip if no new patterns were decided during planning.
-
-#### 7e. Verify Updates
-
-After editing files, confirm that:
-- `state.md` references the new plan
-- `progress.md` has an entry for the plan
-- `architecture.md` updated if architectural changes are planned
-- `patterns.md` updated if new patterns were decided
-
-**Only after completing Steps 7a-7e should you present the final summary to the user.**
-
-The PostToolUse hook will verify context files were updated after plan save.
+**Only after completing Steps 7a-7e should you present the final summary.**
 
 ## Reference
 
