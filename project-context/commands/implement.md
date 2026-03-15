@@ -10,6 +10,7 @@ allowed-tools:
   - Glob
   - Grep
   - Task
+  - Agent
 ---
 
 # Implement Plan
@@ -19,68 +20,42 @@ Execute an implementation plan with multi-agent parallelism and automatic deviat
 ## Usage
 
 ```
-/project-context:implement [plan-path] [--solo] [--strategy teams|subagents|sequential]
+/project-context:implement [plan-path] [--sequential]
 ```
 
-**Execution flags:**
-- **`--solo`** — Skip Agent Teams, use subagents or sequential (shorthand for `--strategy subagents`)
-- **`--strategy teams`** — Force Agent Teams (fails if not enabled)
-- **`--strategy subagents`** — Force Task subagents (same as `--solo`)
-- **`--strategy sequential`** — Force sequential execution, no parallelism
+**Flags:**
+- **`--sequential`** — Force sequential execution, no parallel agents
 
-If no flag is provided, auto-selects the best available strategy.
+If no flag is provided, uses `task-implementer` agents for parallel execution.
 
-## Execution Strategy Selection
+## Execution Strategy
 
-Resolve strategy from flags first, then auto-detect:
+**Default: Agent-based parallel execution**
+1. Launch a `context-reader` agent to produce a project digest
+2. For each phase, group tasks by dependencies
+3. Launch `task-implementer` agents in parallel for independent tasks within a phase
+4. Collect results, handle ASK-level deviations in the main session
+5. After all phases complete, launch `context-syncer` agent for post-completion sync
 
-1. **Parse flags** — `--solo` or `--strategy` override auto-detection
-2. **Auto-detect** (no flags) — Agent Teams > Task subagents > Sequential
-
-### Strategy: Agent Teams (auto or `--strategy teams`)
-
-**When:** No `--solo`, plan has 3+ independent tasks, and Agent Teams is enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`).
-
-Agent Teams provide true parallel execution with separate context windows and inter-agent coordination:
-
-1. **Team lead** (this session) coordinates execution and tracks progress
-2. **Teammates** execute independent tasks in parallel with fresh context
-3. **Shared task list** provides DAG-based dependency tracking
-4. **Inter-agent messaging** allows teammates to flag conflicts or shared concerns
-
-**Setup:**
-- Enable delegate mode (`Shift+Tab`) so the lead focuses on coordination
-- Assign each independent task to a separate teammate
-- Teammates should read architecture.md and patterns.md before implementing
-- Use the shared task list to track dependencies between phases
-
-**Teammate assignment pattern:**
 ```
-Phase 1 — 3 independent tasks:
-  Teammate A: auth middleware    [reads architecture.md → implements → verifies]
-  Teammate B: login endpoint     [reads patterns.md → implements → verifies]
-  Teammate C: auth tests         [reads both → implements → verifies]
-
-Team lead: monitors progress, resolves conflicts, handles deviations
-
-Phase 2 — depends on Phase 1:
-  Lead waits for Phase 1 completion → assigns Phase 2 tasks
+Phase 1: task-implementer (A) ──┐
+         task-implementer (B) ──┤ parallel (independent tasks)
+         task-implementer (C) ──┘
+                                ↓
+                          Collect, handle deviations
+Phase 2: task-implementer (D) ──┐
+         task-implementer (E) ──┘
+                                ↓
+                          context-syncer agent
 ```
 
-### Strategy: Task Subagents (`--solo` / `--strategy subagents` / default fallback)
+Each `task-implementer` agent receives:
+- The specific task (Files, Action, Verify, Done criteria)
+- The project context digest from `context-reader`
+- Deviation rules and locked decisions from the plan
 
-**When:** `--solo` specified, or Agent Teams not available/plan too small.
-
-Use Task tool subagents for parallel execution:
-- **Parallel task execution**: Launch independent tasks within a phase simultaneously
-- **Fresh context per task**: Each subagent gets a clean context window
-- **Codebase exploration**: Use `subagent_type=Explore` before modifying unfamiliar code
-
-### Strategy: Sequential (`--strategy sequential` / final fallback)
-
-**When:** `--strategy sequential` specified, or neither Agent Teams nor Task tool is available.
-
-Execute tasks sequentially with direct tool operations.
+**Fallback: Sequential execution**
+If Agent tool is unavailable or `--sequential` is specified, execute tasks sequentially with direct tool operations in the main session.
 
 ## Workflow
 
@@ -100,7 +75,7 @@ Present the plan summary and ask:
 ```
 Plan: [Name]
 Phases: [N] with [M] total tasks
-Execution: [Agent Teams / Task subagents / Sequential]
+Execution: [Parallel agents / Sequential]
 
 Options:
 1. Implement all phases
@@ -113,13 +88,17 @@ Options:
 
 ### Step 3: Read Project Context
 
-Before implementing, read:
+**Launch a `context-reader` agent** to produce a condensed project digest covering architecture, patterns, state, and dependencies.
+
+The digest is passed to each `task-implementer` agent so they don't re-read the same files.
+
+**If Agent tool is unavailable**, read directly:
 - `.project-context/architecture.md` — Follow existing patterns
 - `.project-context/patterns.md` — Respect conventions
 - `.project-context/state.md` — Current position
 - `.project-context/dependencies.json` — Cross-project boundaries (if present)
 
-If `dependencies.json` exists, build a Dependency Digest (see `project-context/skills/project-context/references/dependency-loading.md`). Use it during execution to detect when tasks touch integration boundaries.
+If `dependencies.json` exists, the digest should include dependency info for detecting when tasks touch integration boundaries.
 
 ### Step 4: Initialize Task Tracking
 
@@ -136,8 +115,8 @@ For each phase:
 
 1. **Announce the phase** with task list
 2. **Group tasks by dependencies**:
-   - Independent tasks within a phase → execute in parallel (per selected strategy)
-   - Dependent tasks → execute sequentially
+   - Independent tasks → launch `task-implementer` agents in parallel
+   - Dependent tasks → execute sequentially (wait for dependencies to complete)
 3. **For each task**, follow the executable format:
    - Read the **Action** field for what to do
    - Implement the change
@@ -162,7 +141,7 @@ When encountering unexpected situations during execution:
 
 **Rule: ASK always supersedes Auto-fix/Auto-add.** When in doubt, ask.
 
-**Agent Teams deviation handling:** Teammates should message the team lead when they encounter ASK-level deviations. The lead coordinates with the user and broadcasts the decision to all teammates.
+**Agent deviation handling:** `task-implementer` agents report DEVIATION-level situations in their results. The main session (orchestrator) collects these and consults the user before proceeding.
 
 ### Step 7: MANDATORY — Sync Context Files
 
@@ -276,7 +255,7 @@ Implementation Complete!
 
 Phases: [X/Y] completed
 Tasks: [N] completed, [M] skipped
-Execution: [Agent Teams with N teammates / Task subagents / Sequential]
+Execution: [Parallel agents / Sequential]
 
 Files created:
 - path/to/new-file.ts
@@ -299,44 +278,30 @@ Next steps:
 2. [Consider running /project-context:update --chat to capture additional learnings]
 ```
 
-## Multi-Agent Execution Patterns
-
-### Agent Teams Pattern
+## Agent Execution Pattern
 
 ```
+context-reader agent ──────────────────┐ (produces project digest)
+                                       ↓
 Phase 1 — 3 independent tasks:
-  Teammate A: auth middleware    [fresh context window]
-  Teammate B: login endpoint     [fresh context window]
-  Teammate C: auth tests         [fresh context window]
-
-Team lead: coordinates, resolves conflicts, handles deviations
-
+  task-implementer (auth middleware) ──┐
+  task-implementer (login endpoint) ──┤ parallel
+  task-implementer (auth tests) ──────┘
+                                       ↓
+                                 Collect results, handle deviations
 Phase 2 — depends on Phase 1:
-  Lead waits for Phase 1 → assigns Phase 2 teammates
+  task-implementer (dashboard) ────────┐
+  task-implementer (nav update) ───────┘ parallel
+                                       ↓
+                                 Collect results
+                                       ↓
+context-syncer agent ──────────────────┘ (updates state.md, progress.md, etc.)
 ```
 
-Each teammate receives (via shared task list + project context):
-- The specific task (Action, Verify, Done criteria)
-- Relevant project context (architecture, patterns)
-- Locked decisions from the plan
-
-### Task Subagents Pattern (`--solo`)
-
-```
-Phase 1 has 3 independent tasks:
-  Task 1 (auth middleware)    → Subagent A [fresh context]
-  Task 2 (login endpoint)    → Subagent B [fresh context]
-  Task 3 (auth tests)        → Subagent C [fresh context]
-
-Phase 2 depends on Phase 1:
-  Task 4 (depends on 1+2)    → Sequential after Phase 1
-  Task 5 (independent)       → Can parallel with Task 4
-```
-
-Each subagent receives (via Task prompt):
-- The specific task (Action, Verify, Done criteria)
-- Relevant project context (architecture, patterns)
-- Locked decisions from the plan
+Each `task-implementer` agent receives:
+- The specific task (Files, Action, Verify, Done criteria)
+- The condensed project context digest
+- Deviation rules and locked decisions from the plan
 
 ## Best Practices
 
@@ -344,6 +309,6 @@ Each subagent receives (via Task prompt):
 - **Follow existing patterns** — Read architecture.md and patterns.md
 - **Atomic progress** — Update state after each task, not just at the end
 - **Deviation rules** — Auto-fix bugs, ask about architecture changes
-- **Fresh context** — Use Agent Teams or subagents for independent tasks to avoid context degradation
+- **Fresh context** — Use `task-implementer` agents for independent tasks to avoid context degradation
 - **Persistent tracking** — Use native Tasks so progress survives session interruptions
-- **Use `--solo` for small plans** — Agent Teams overhead isn't worth it for 1-2 tasks
+- **Small plans** — For 1-2 tasks, `--sequential` avoids agent overhead

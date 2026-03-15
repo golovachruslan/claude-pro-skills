@@ -7,6 +7,7 @@ allowed-tools:
   - Glob
   - Grep
   - AskUserQuestion
+  - Agent
 ---
 
 # Challenge-It
@@ -59,12 +60,18 @@ If `.project-context/` doesn't exist, skill works standalone.
 
 ### 1. Gather Context
 
-**Check for project-context:**
+**Launch a `context-reader` agent** to produce a condensed project digest:
+- The agent reads `.project-context/` files (architecture.md, patterns.md, brief.md, dependencies.json)
+- Returns a compact digest with Tech Stack, Key Patterns, Current State, Active Dependencies
+- If `.project-context/` doesn't exist, skip — the skill works standalone
+
+**If Agent tool is unavailable**, fall back to reading files directly:
 ```bash
 ls .project-context/*.md 2>/dev/null
 ```
+Then read architecture.md, patterns.md, brief.md, and dependencies.json manually.
 
-**If available, read selectively based on what's being challenged:**
+When reading files manually, read selectively based on what's being challenged:
 
 | Challenge Target | Read |
 |-----------------|------|
@@ -94,7 +101,33 @@ Clearly identify what's being evaluated:
 
 ### 3. Analyze from All Six Perspectives
 
-For each critic:
+**Standard and Brutal modes — launch `critic` agents in parallel:**
+
+Launch 6 `critic` agents simultaneously, each receiving:
+- Its assigned perspective (Skeptic, Pragmatist, Chaos Engineer, Architect, Root Cause, Future Dev)
+- The proposal/plan text being challenged
+- The project context digest from Step 1
+- Dependency info if relevant
+
+```
+Main → context-reader agent ────────────┐
+     → critic agent (Skeptic) ───────────┤
+     → critic agent (Pragmatist) ────────┤
+     → critic agent (Chaos Engineer) ────┤  all parallel
+     → critic agent (Architect) ─────────┤
+     → critic agent (Root Cause) ────────┤
+     → critic agent (Future Dev) ────────┘
+                                         ↓
+                                   Synthesize results
+```
+
+**Brutal mode:** Also launch 2-3 additional `critic` agents with domain-specific perspectives from `references/critic-frameworks.md` (Security, Performance, UX, etc. based on context).
+
+**Quick mode (`--quick`):** Run sequentially in the main session — agent overhead isn't worth it for 3 concerns. Analyze from all perspectives but only report the top 3 concerns.
+
+**Fallback — if Agent tool is unavailable:** Analyze from all six perspectives sequentially in the main session.
+
+For each critic (whether agent or sequential):
 - Apply the perspective to find genuine concerns
 - Use project context to make concerns specific
 - Reference actual patterns/code when relevant

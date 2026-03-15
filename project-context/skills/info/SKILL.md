@@ -36,7 +36,9 @@ If no context files exist, skip to step 2. Do NOT suggest initialization — foc
 
 ### 2. Research the Codebase
 
-Use targeted codebase exploration to find the answer. Choose strategy based on question type:
+Use targeted codebase exploration to find the answer. For complex questions, launch a `context-reader` agent and a `codebase-explorer` agent in parallel — context-reader provides project background while codebase-explorer digs into the code.
+
+Choose strategy based on question type:
 
 **"Where is X?"** — Find files/symbols
 - Glob for file patterns matching the concept
@@ -44,9 +46,8 @@ Use targeted codebase exploration to find the answer. Choose strategy based on q
 - Report file paths with line numbers
 
 **"How does X work?"** — Trace execution flow
-- Find the entry point (Grep for function/class name)
-- Read the implementation
-- Follow key dependencies one level deep
+- Launch a `codebase-explorer` agent with the question and relevant directories
+- Or manually: find entry point, read implementation, follow dependencies one level deep
 - Summarize the flow
 
 **"What does this project do?"** — High-level overview
@@ -61,8 +62,10 @@ Use targeted codebase exploration to find the answer. Choose strategy based on q
 - Look for comments, docs, or ADRs explaining the decision
 
 **General / complex questions** — Use parallel research
-- Launch an Explore subagent via Task tool for broad research
-- Combine findings with context files
+- Launch a `codebase-explorer` agent for broad codebase research
+- Optionally launch `context-reader` agent in parallel for project context
+- Combine findings from both agents
+- Fallback: if Agent tool unavailable, use Glob/Grep/Read directly
 
 ### 3. Synthesize the Answer
 

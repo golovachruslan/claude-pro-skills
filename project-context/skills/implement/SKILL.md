@@ -10,6 +10,7 @@ allowed-tools:
   - Glob
   - Grep
   - Task
+  - Agent
 hooks:
   PostToolUse:
     - matcher: "Edit"
@@ -59,6 +60,15 @@ hooks:
 # Implementation Skill
 
 This skill enforces context file synchronization when plans are implemented. It works alongside the `/project-context:implement` command.
+
+## Agents
+
+This skill uses the following agents:
+- **`task-implementer`** — Executes individual plan tasks in parallel (independent tasks within a phase)
+- **`context-syncer`** — Updates context files post-completion (state.md, progress.md, etc.)
+- **`context-reader`** — Reads project context once for distribution to task-implementer agents
+
+If the Agent tool is unavailable, tasks execute sequentially and context syncing happens manually.
 
 ## Context Sync Enforcement
 
