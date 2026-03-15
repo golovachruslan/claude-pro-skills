@@ -28,10 +28,12 @@ Check for project context to ask informed questions:
 ls .project-context/*.md 2>/dev/null
 ```
 
-If exists, read `brief.md`, `architecture.md`, and `patterns.md` to understand the project. Reference specifics in your questions.
+If exists, read selectively:
+- **Always:** `brief.md` (project scope/goals — essential for scoping discussion)
+- **If feature involves architecture:** `architecture.md` (tech stack, existing design)
+- **Defer:** `patterns.md` — only read if discussion reveals pattern-related gray areas
 
-**Also check for dependencies:**
-If `.project-context/dependencies.json` exists, build a Dependency Digest (see `project-context/skills/project-context/references/dependency-loading.md`). This gives you a concise map of what each dependency provides — used in Step 3 to surface integration gray areas.
+**Dependencies:** Only check `dependencies.json` if the feature description mentions integration, APIs, cross-project, or shared services. If it does, build a Dependency Digest (see `references/dependency-loading.md`) for Step 3.
 
 ### 2. Understand the Feature
 

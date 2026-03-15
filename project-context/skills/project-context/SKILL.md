@@ -40,7 +40,7 @@ If not found: "No project context found. Run `/project-context:init` to set up."
 | "What patterns do we use?" | patterns.md | architecture.md |
 | "What depends on this?" | dependencies.json | architecture.md |
 | "Cross-project impact?" | dependencies.json | state.md |
-| General context | All files | - |
+| General context | brief.md + state.md | architecture.md (only if needed) |
 
 ### 3. Synthesize Response
 
