@@ -31,8 +31,8 @@
     },
     {
       "name": "project-context",
-      "description": "Maintain project context across sessions with structured files, brainstorm-first workflow, federated dependency graph, and native Claude Code features (Agent Teams, Plan Mode, persistent Tasks)",
-      "version": "2.5.1",
+      "description": "Maintain project context across sessions with structured markdown files, brainstorm-first workflow, federated dependency graph for monorepos, and smart routing with session continuity.",
+      "version": "2.7.0",
       "source": "./project-context",
       "category": "productivity"
     },

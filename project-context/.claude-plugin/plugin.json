@@ -1,7 +1,7 @@
 {
   "name": "project-context",
   "version": "2.7.0",
-  "description": "Maintain project context across sessions with structured files. 5 markdown files + dependencies.json for monorepos and cross-repo dependencies. Brainstorm-first workflow: discuss → plan → implement → update. Federated dependency graph via /add-dependency command — supports both local paths and git URLs (fetches only .project-context/ from remote repos). Leverages native Claude Code features: Agent Teams for parallel execution, Plan Mode for research-first planning, and persistent Tasks for cross-session tracking. Includes smart routing, session continuity, quick mode, and adversarial challenge mode.",
+  "description": "Maintain project context across sessions with structured markdown files, brainstorm-first workflow, federated dependency graph for monorepos, and smart routing with session continuity.",
   "author": {
     "name": "Ruslan Halavach",
     "email": "golovachruslan@gmail.com"
@@ -14,26 +14,13 @@
     "project-management",
     "planning",
     "brainstorming",
-    "implementation",
     "session-continuity",
-    "multi-agent",
-    "agent-teams",
-    "plan-mode",
-    "native-tasks",
     "smart-routing",
-    "retrospective",
-    "challenge",
-    "quick-mode",
-    "state-management",
-    "executable-plans",
-    "deviation-rules",
     "monorepo",
     "dependencies",
     "dependency-graph",
     "cross-project",
-    "git-link",
-    "remote-dependency",
-    "shallow-clone"
+    "state-management"
   ],
   "agents": "./agents",
   "commands": "./commands",
