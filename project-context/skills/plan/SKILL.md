@@ -47,7 +47,8 @@ Create structured, executable implementation plans. **Plans should flow from loc
 
 ### 1. Read Project Context
 
-**Always do this first:**
+**Always do this first.** Launch a `context-reader` agent to produce a condensed project digest, or read files directly if Agent tool is unavailable:
+
 ```bash
 ls .project-context/*.md 2>/dev/null
 ```
@@ -185,6 +186,8 @@ If applicable, use Edit to add new patterns. If patterns.md was not read in Step
 
 #### 7e. Verify
 Confirm state.md and progress.md reference the plan. The PostToolUse hook enforces this.
+
+**Alternative:** Launch a `context-syncer` agent for Steps 7a-7d to update all files in one pass. The agent receives the plan summary and handles state.md, progress.md, architecture.md, and patterns.md updates. If Agent tool is unavailable, perform each update manually as described above.
 
 **Only after completing Steps 7a-7e should you present the final summary.**
 

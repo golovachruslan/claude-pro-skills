@@ -35,6 +35,7 @@
     "remote-dependency",
     "shallow-clone"
   ],
+  "agents": "./agents",
   "commands": "./commands",
   "skills": "./skills"
 }

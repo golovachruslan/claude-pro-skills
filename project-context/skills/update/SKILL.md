@@ -9,6 +9,7 @@ allowed-tools:
   - Bash
   - Glob
   - Grep
+  - Agent
 ---
 
 # Update Project Context
@@ -54,6 +55,10 @@ If not found: "Run `/project-context:init` first."
 
 ### 2a. Analyze Conversation
 
+**Launch a `conversation-analyzer` agent** to systematically extract insights. The agent receives signal recognition patterns and the current context digest. It runs in parallel with Step 2b.
+
+**If Agent tool is unavailable**, analyze manually in the main session.
+
 Review the current conversation to identify:
 
 **Key Learnings:**
@@ -90,7 +95,16 @@ Use signal recognition from `references/analysis-patterns.md` to systematically 
 
 ### 2b. Check Existing Context (Selective)
 
-Read **only the files you intend to update** to check for redundancy — not all 5 files. Use the categorization from Step 2c to determine which files are relevant. If updating `patterns.md`, only read `patterns.md`. If updating multiple files, read only those.
+**Launch a `context-reader` agent** to condense existing context into a digest. This runs in parallel with Step 2a — the two are independent.
+
+```
+Main → conversation-analyzer agent ───┐
+     → context-reader agent ───────────┤ parallel
+                                       ↓
+                                 Merge results → Steps 2c-2f
+```
+
+**If Agent tool is unavailable**, read selectively in the main session — only the files you intend to update, not all 5. Use the categorization from Step 2c to determine which files are relevant.
 
 ### 2c. Categorize Learnings
 
