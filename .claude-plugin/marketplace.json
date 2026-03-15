@@ -42,6 +42,13 @@
       "version": "1.0.0",
       "source": "./agent-context-plugin",
       "category": "productivity"
+    },
+    {
+      "name": "agent-config",
+      "description": "Configure Claude Code plugin ecosystems with setup.yaml and SessionStart hooks for automatic team onboarding",
+      "version": "1.0.0",
+      "source": "./agent-config-plugin",
+      "category": "development"
     }
   ]
 }
