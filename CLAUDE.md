@@ -225,3 +225,16 @@ Ensure plugin.json includes:
 - **Self-documenting**: Skills contain their own documentation in SKILL.md files
 - **Context-aware loading**: Only relevant references are loaded on-demand to save context
 - **Improvement workflow always requires approval**: Changes are never applied without user consent
+
+<!-- PROJECT-CONTEXT:START -->
+## Project Context
+
+Always read `.project-context/` files when starting work:
+- `brief.md` — Project goals, scope, requirements
+- `architecture.md` — System design, tech stack, flows
+- `state.md` — Current position, blockers, next action
+- `progress.md` — Completed/in-progress/upcoming work
+- `patterns.md` — Established patterns and learnings
+- `dependencies.json` — Cross-project dependencies (monorepo)
+
+<!-- PROJECT-CONTEXT:END -->
