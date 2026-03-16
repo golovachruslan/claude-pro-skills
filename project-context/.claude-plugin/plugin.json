@@ -22,7 +22,6 @@
     "cross-project",
     "state-management"
   ],
-  "agents": "./agents",
   "commands": "./commands",
   "skills": "./skills"
 }
