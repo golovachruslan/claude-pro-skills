@@ -191,6 +191,14 @@ python project-context/scripts/manage_context.py update-sections --file CLAUDE.m
 python project-context/scripts/manage_context.py update-sections --file AGENTS.md
 ```
 
+## Step 3.5: Suggest Optimization (if needed)
+
+After applying updates, check if context files have grown significantly:
+- progress.md has 10+ completed items → suggest compacting: "progress.md has grown. Run `/project-context:optimize` to archive completed items."
+- Any file exceeds ~100 lines → suggest organizing: "[file] is getting large. Run `/project-context:optimize` to split into focused files."
+
+This is a suggestion only — do not auto-run optimize.
+
 ## Step 4: Show Summary
 
 ```markdown

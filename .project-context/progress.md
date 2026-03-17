@@ -6,6 +6,7 @@
 - [x] Cleared stale plugin cache at ~/.claude/plugins/cache (2026-03-15)
 - [x] Created agent-config plugin with SessionStart hooks (2026-03-15)
 - [x] PR #38 merged
+- [x] Created `optimize` skill for project-context plugin v2.8.0 — compact + organize operations with file splitting, per-feature archives, cross-file consistency (2026-03-17)
 
 ## In Progress
 - [ ] Resolve 2 plugin load errors from /reload-plugins
