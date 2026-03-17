@@ -156,6 +156,17 @@ Run /project-context:brainstorm to brainstorm first feature
 *Last updated: [current date]*
 ```
 
+### Step 4.5: Offer Optimization (existing projects only)
+
+If context files already existed before init (Step 1 found existing files and user chose to keep them):
+
+```
+Your existing context files may benefit from optimization.
+Run `/project-context:optimize` to compact and organize them for efficient AI consumption.
+```
+
+This is relevant when onboarding an existing project — context files may have accumulated stale or verbose content.
+
 ### Step 5: Update CLAUDE.md and AGENTS.md
 
 Use the Python script for reliable managed section updates:

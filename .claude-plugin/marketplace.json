@@ -31,8 +31,8 @@
     },
     {
       "name": "project-context",
-      "description": "Maintain project context across sessions with structured markdown files, brainstorm-first workflow, federated dependency graph for monorepos, and smart routing with session continuity.",
-      "version": "2.7.0",
+      "description": "Maintain project context across sessions with structured markdown files, brainstorm-first workflow, context optimization (compact + organize), federated dependency graph for monorepos, and smart routing with session continuity.",
+      "version": "2.8.0",
       "source": "./project-context",
       "category": "productivity"
     },
