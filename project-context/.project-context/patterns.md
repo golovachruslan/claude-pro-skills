@@ -4,6 +4,8 @@
 - Skills invoke agents for heavy lifting; agents write results to files to avoid bloating orchestrator context
 - Python scripts used for deterministic file operations (managing sections with HTML comment markers)
 - `<!-- PROJECT-CONTEXT:START -->` / `<!-- PROJECT-CONTEXT:END -->` for managed CLAUDE.md sections
+- Prefer skills over command wrappers: when a command does nothing but delegate to a skill, remove it — Claude Code invokes skills directly
+- Two-tier enforcement for context updates: Tier 1 (hard, blocks) for state.md/progress.md; Tier 2 (soft, warns) for architecture.md/patterns.md — implemented via PostToolUse hooks
 
 ## Naming Conventions
 - Skills: hyphen-case (`add-dependency`, `plan-verification`)
@@ -21,4 +23,4 @@
 - Don't store session-specific data in permanent context files
 
 ---
-*Last updated: 2026-02-20*
+*Last updated: 2026-03-08*
